@@ -1,6 +1,7 @@
-use csv::{ReaderBuilder, StringRecord, WriterBuilder};
+use csv::ReaderBuilder;
+use std::collections::HashMap;
 use std::fs::File;
-use std::io;
+use std::error::Error;
 
 use crate::scheme::StatusData;
 use super::super::utils::{
@@ -8,11 +9,11 @@ use super::super::utils::{
     is_file
 };
 
-
-pub fn sort_csv_by_column(
+pub fn agrregate_csv_data(
     target_file: &str,
-    column_name: &str,
-    is_reverse: bool,
+    key_column: &str,
+    target_columns: &[&str],
+    floatmode: bool,
 ) -> StatusData {
 
     // 対象ファイルの絶対パスを取得
@@ -55,32 +56,17 @@ pub fn sort_csv_by_column(
     // ヘッダーを取得
     let headers = reader.headers().expect("Header get error.").clone();
 
-    // 列名から列のインデックスを見つける
-    let column_index = headers.iter().position(|h| h == column_name)
-        .ok_or_else(|| format!("Column name: `{}` not found.", column_name)).expect("Error");
+    // key_columnのインデックスを見つける
+    let key_column_index = headers.iter().position(|h| h == key_column)
+        .ok_or_else(|| format!("Column name: `{}` not found.", key_column)).expect("Error");
 
-    // レコードを読み込む
-    let mut records: Vec<StringRecord> = reader.records()
-        .filter_map(Result::ok)
-        .collect();
-
-    // 指定された列でレコードをソート
-    if is_reverse {
-        records.sort_by(|a, b| b[column_index].cmp(&a[column_index]));
-    } else {
-        records.sort_by(|a, b| a[column_index].cmp(&b[column_index]));
-    }
-
-    // ソートされたレコードを標準出力
-    let mut writer = WriterBuilder::new().from_writer(io::stdout());
-    let _ = writer.write_record(&headers);
-
-    for record in records {
-        writer.write_record(&record).expect("Error.");
+    for result in reader.records() {
+        let record = result.expect("CSV Error.");
+        let key = record.get(key_column_index).unwrap_or_default();
     }
 
     StatusData {
         status_code: 200,
-        message: "CSV Sorted.".to_string()
+        message: "File read successfully.".to_string(),
     }
 }
