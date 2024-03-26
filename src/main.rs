@@ -3,7 +3,7 @@ use clap::{App, Arg, Command};
 mod rustex;
 mod scheme;
 mod utils;
-use rustex::aggregate::agrregate_csv_data;
+use rustex::aggregate::aggregate_csv_data;
 use rustex::sortcsv::sort_csv_by_column;
 use rustex::split::split_file;
 use rustex::groupby::groupby_column_csv;
@@ -104,8 +104,8 @@ fn main() {
                 ),
         )
         .subcommand(
-            Command::new("agrregate")
-                .about("Agrregate CSV.")
+            Command::new("aggregate")
+                .about("Aggregate CSV.")
                 .arg(
                     Arg::new("target")
                         .short('t')
@@ -139,7 +139,7 @@ fn main() {
                         .short('f')
                         .long("floatmode")
                         .value_name("FLOATM ODE")
-                        .help("Agrregate float.")
+                        .help("Aggregate float.")
                         .required(false)
                         .takes_value(false)
                 ),
@@ -181,7 +181,7 @@ fn main() {
         ) {
             let _ = groupby_column_csv(target_file, column_name);
         }
-    } else if let Some(matches) = matches.subcommand_matches("agrregate") {
+    } else if let Some(matches) = matches.subcommand_matches("aggregate") {
         if let (Some(target_file), Some(key_column), Some(columns), floatmode) = (
             matches.value_of("target"),
             matches.value_of("keycol"),
@@ -190,9 +190,9 @@ fn main() {
          ) {
             let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
             if floatmode {
-                let _ = agrregate_csv_data(target_file, key_column, &columns_str, true);
+                let _ = aggregate_csv_data(target_file, key_column, &columns_str, true);
             } else {
-                let _ = agrregate_csv_data(target_file, key_column, &columns_str, false);
+                let _ = aggregate_csv_data(target_file, key_column, &columns_str, false);
             }
         }
     }

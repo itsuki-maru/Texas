@@ -69,8 +69,9 @@ pub fn groupby_column_csv(
     }
 
     // 出現回数を表示
+    println!("===== TARGET COLUMN: {} =====", column_name);
     for (value, count) in counts {
-        println!("{}: {}", value, count);
+        println!("{}:\t{}", value, count);
     }
     StatusData {
         status_code: 200,
