@@ -12,6 +12,7 @@ use super::super::utils::{
 pub fn sort_csv_by_column(
     target_file: &str,
     column_name: &str,
+    is_reverse: bool,
 ) -> StatusData {
 
     // 対象ファイルの絶対パスを取得
@@ -64,7 +65,11 @@ pub fn sort_csv_by_column(
         .collect();
 
     // 指定された列でレコードをソート
-    records.sort_by(|a, b| a[column_index].cmp(&b[column_index]));
+    if is_reverse {
+        records.sort_by(|a, b| b[column_index].cmp(&a[column_index]));
+    } else {
+        records.sort_by(|a, b| a[column_index].cmp(&b[column_index]));
+    }
 
     // ソートされたレコードを標準出力
     let mut writer = WriterBuilder::new().from_writer(io::stdout());

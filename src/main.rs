@@ -5,6 +5,7 @@ mod scheme;
 mod utils;
 use rustex::sortcsv::sort_csv_by_column;
 use rustex::split::split_file;
+use rustex::groupby::groupby_column_csv;
 use std::env;
 
 fn main() {
@@ -68,6 +69,15 @@ fn main() {
                         .help("CSV sorted by column.")
                         .required(true)
                         .takes_value(true),
+                )
+                .arg(
+                    Arg::new("reverse")
+                        .short('r')
+                        .long("reverse")
+                        .value_name("REVERSE")
+                        .help("Reverse CSV sort.")
+                        .required(false)
+                        .takes_value(false)
                 ),
         )
         .get_matches();
@@ -87,11 +97,18 @@ fn main() {
             return;
         }
     } else if let Some(matches) = matches.subcommand_matches("sortcsv") {
-        if let (Some(target_file), Some(column_name)) = (
+        if let (Some(target_file), Some(column_name), is_reverse) = (
             matches.value_of("target"),
             matches.value_of("colname"),
+            matches.contains_id("reverse"),
         ) {
-            let _ = sort_csv_by_column(target_file, column_name);
+            if is_reverse {
+                // 降順ソート
+                let _ = sort_csv_by_column(target_file, column_name, true);   
+            } else {
+                // 昇順ソート
+                let _ = sort_csv_by_column(target_file, column_name, false);   
+            }
             // println!(
             //     "Status Code: {}, Message: {}",
             //     result.status_code, result.message
