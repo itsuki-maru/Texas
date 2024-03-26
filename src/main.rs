@@ -3,6 +3,7 @@ use clap::{App, Arg, Command};
 mod rustex;
 mod scheme;
 mod utils;
+use rustex::aggregate::agrregate_csv_data;
 use rustex::sortcsv::sort_csv_by_column;
 use rustex::split::split_file;
 use rustex::groupby::groupby_column_csv;
@@ -102,6 +103,47 @@ fn main() {
                         .takes_value(true),
                 ),
         )
+        .subcommand(
+            Command::new("agrregate")
+                .about("Agrregate CSV.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("keycol")
+                        .short('k')
+                        .long("keycolumn")
+                        .value_name("COLUMN")
+                        .help("Key column.")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("columns")
+                        .short('c')
+                        .long("columns")
+                        .value_name("TARGET COLUMNS")
+                        .help("Target columns.")
+                        .required(true)
+                        .takes_value(true)
+                        .multiple(true)
+                )
+                .arg(
+                    Arg::new("floatmode")
+                        .short('f')
+                        .long("floatmode")
+                        .value_name("FLOATM ODE")
+                        .help("Agrregate float.")
+                        .required(false)
+                        .takes_value(false)
+                ),
+        )
         .get_matches();
 
     // "split" ex) rustex split -t ./testfile/test1.txt -r "^第[1-9]章"
@@ -139,5 +181,19 @@ fn main() {
         ) {
             let _ = groupby_column_csv(target_file, column_name);
         }
-    } 
+    } else if let Some(matches) = matches.subcommand_matches("agrregate") {
+        if let (Some(target_file), Some(key_column), Some(columns), floatmode) = (
+            matches.value_of("target"),
+            matches.value_of("keycol"),
+            matches.get_many::<String>("columns"),
+            matches.contains_id("floatmode"),
+         ) {
+            let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
+            if floatmode {
+                let _ = agrregate_csv_data(target_file, key_column, &columns_str, true);
+            } else {
+                let _ = agrregate_csv_data(target_file, key_column, &columns_str, false);
+            }
+        }
+    }
 }

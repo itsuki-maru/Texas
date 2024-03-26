@@ -1,7 +1,6 @@
 use csv::ReaderBuilder;
 use std::collections::HashMap;
 use std::fs::File;
-use std::error::Error;
 
 use crate::scheme::StatusData;
 use super::super::utils::{
@@ -60,9 +59,36 @@ pub fn agrregate_csv_data(
     let key_column_index = headers.iter().position(|h| h == key_column)
         .ok_or_else(|| format!("Column name: `{}` not found.", key_column)).expect("Error");
 
+    // 各キーに対する合計と件数を保持するHashMap
+    let mut data: HashMap<&str, HashMap<String, (f64, u32)>> = HashMap::new();
+
+    // レコードをイテレート
     for result in reader.records() {
         let record = result.expect("CSV Error.");
         let key = record.get(key_column_index).unwrap_or_default();
+        for &column in target_columns {
+            // key_columnのインデックスを見つける
+            let key_column = headers.iter().position(|h| h == key_column)
+                .ok_or_else(|| format!("Column name: `{}` not found.", key_column)).expect("Error");
+            if let Some(value_str) = record.get(key_column) {
+                let value = if floatmode {
+                    value_str.parse::<f64>().unwrap_or(0.0)
+                } else {
+                    value_str.parse::<f64>().unwrap_or(0.0) as f64
+                };
+                let entry = data.get_mut(column).unwrap().entry(key.to_string()).or_insert((0.0, 0));
+                entry.0 += value;
+                entry.1 += 1;
+            }
+        }
+    }
+
+    // 結果を出力
+    for &column in target_columns {
+        println!("Column: {}", column);
+        for (key, (sum, count)) in data.get(column).unwrap().iter() {
+            println!("Key: {}, Sum: {}, Count: {}", key, sum, count);
+        }
     }
 
     StatusData {
