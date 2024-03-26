@@ -80,6 +80,28 @@ fn main() {
                         .takes_value(false)
                 ),
         )
+        .subcommand(
+            Command::new("groupby")
+                .about("Groupby CSV column.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("colname")
+                        .short('c')
+                        .long("column")
+                        .value_name("COLUMN")
+                        .help("CSV groupby column.")
+                        .required(true)
+                        .takes_value(true),
+                ),
+        )
         .get_matches();
 
     // "split" ex) rustex split -t ./testfile/test1.txt -r "^第[1-9]章"
@@ -109,12 +131,13 @@ fn main() {
                 // 昇順ソート
                 let _ = sort_csv_by_column(target_file, column_name, false);   
             }
-            // println!(
-            //     "Status Code: {}, Message: {}",
-            //     result.status_code, result.message
-            // );
-            // return;
         }
-    }
-    {}
+    } else if let Some(matches) = matches.subcommand_matches("groupby") {
+        if let (Some(target_file), Some(column_name)) = (
+            matches.value_of("target"),
+            matches.value_of("colname"),
+        ) {
+            let _ = groupby_column_csv(target_file, column_name);
+        }
+    } 
 }

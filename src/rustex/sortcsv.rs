@@ -57,7 +57,7 @@ pub fn sort_csv_by_column(
 
     // 列名から列のインデックスを見つける
     let column_index = headers.iter().position(|h| h == column_name)
-        .ok_or_else(|| "指定された列名が見つかりません").expect("Error");
+        .ok_or_else(|| format!("Column name: `{}` not found.", column_name)).expect("Error");
 
     // レコードを読み込む
     let mut records: Vec<StringRecord> = reader.records()

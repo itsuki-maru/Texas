@@ -2,16 +2,12 @@ use regex::Regex;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-
-
-
 use crate::scheme::StatusData;
 use super::super::utils::{
     get_abs_filepath,
     get_abs_directory_path,
     is_dir,
 };
-
 
 
 // "split"
