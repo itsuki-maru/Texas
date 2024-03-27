@@ -279,6 +279,47 @@ fn main() {
                         .takes_value(true),
                 ),
         )
+        .subcommand(
+            Command::new("grep")
+                .about("Grep file on a reguler expression.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("regex")
+                        .short('r')
+                        .long("regex")
+                        .value_name("REGEX")
+                        .help("Reguler expression for splitting.")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .value_name("OUTPUT")
+                        .help("Output directory.")
+                        .required(false)
+                        .takes_value(true)
+                        .default_value(current_dir_str),
+                )
+                .arg(
+                    Arg::new("csv")
+                        .short('c')
+                        .long("csv")
+                        .value_name("CSV HEADER")
+                        .help("CSV header row insert.")
+                        .required(false)
+                        .takes_value(false)
+                ),
+        )
         .get_matches();
 
 
@@ -350,9 +391,8 @@ fn main() {
                 let _ = print_header_csv(target_file);
             } else {
                 if let Some(read_limit) = matches.get_one::<usize>("limit").copied() {
-                    let _ = match read_limit {
-                        n => print_head(target_file, n),
-                        _ => print_head(target_file, 5),
+                    match read_limit {
+                        n => print_head(target_file, n)
                     };
                 }
                 
@@ -367,7 +407,9 @@ fn main() {
             matches.value_of("output"),
          ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
-            let _ = extract_column(target_file, columns_str, output_dir);
+            let result = extract_column(target_file, columns_str, output_dir);
+            println!("Status: {} Message: {}", result.status_code, result.message);
+
         }
     
     // "clean" ex) rustex clean -t ./testfile/test2.csv -r "^[2-3],"
@@ -378,10 +420,7 @@ fn main() {
             matches.value_of("output"),
         ) {
             let result = clean_row(target_file, regex_pattrern, output_dir);
-            println!(
-                "Status Code: {}, Message: {}",
-                result.status_code, result.message
-            );
+            println!("Status: {} Message: {}", result.status_code, result.message);
         }
     // "collect" ex) rustex collect -t ./test -r "maru"
     // "collect" ex) rustex collect -t ./test -r "^maru" ./collect
@@ -391,7 +430,26 @@ fn main() {
             matches.value_of("output"),
             matches.value_of("regex"),
         ) {
-            let _ = collect_file(target_dir, output_dir, regex_pattern);
+            let result = collect_file(target_dir, output_dir, regex_pattern);
+            println!("Status: {} Message: {}", result.status_code, result.message);
+        }
+
+    // "grep" ex) rustex grep -t ./testfile/test1.txt -r ^これは`
+    // "grep" ex) rustex grep -t ./testfile/test2.csv -r ^1,` -c
+    } else if let Some(matches) = matches.subcommand_matches("grep") {
+        if let (Some(target_file), Some(regex_pattern), Some(output_dir), csv_header) = (
+            matches.value_of("target"),
+            matches.value_of("regex"),
+            matches.value_of("output"),
+            matches.contains_id("csv"),
+        ) {
+            if csv_header {
+                let result = grep_row(target_file, regex_pattern, output_dir, true);
+                println!("Status: {} Message: {}", result.status_code, result.message);
+            } else {
+                let result = grep_row(target_file, regex_pattern, output_dir, false);
+                println!("Status: {} Message: {}", result.status_code, result.message);
+            }
         }
     }
 }
