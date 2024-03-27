@@ -247,6 +247,38 @@ fn main() {
                         .default_value(current_dir_str),
                 ),
         )
+        .subcommand(
+            Command::new("collect")
+                .about("Collect file on a reguler expression.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .value_name("OUTPUT")
+                        .help("Output directory.")
+                        .required(false)
+                        .takes_value(true)
+                        .default_value(current_dir_str),
+                )
+                .arg(
+                    Arg::new("regex")
+                        .short('r')
+                        .long("regex")
+                        .value_name("REGEX")
+                        .help("Reguler expression for splitting.")
+                        .required(true)
+                        .takes_value(true),
+                ),
+        )
         .get_matches();
 
 
@@ -338,7 +370,7 @@ fn main() {
             let _ = extract_column(target_file, columns_str, output_dir);
         }
     
-    // "clean" ex) rustex clean -t .\testfile\test2.csv -r "^[2-3],"
+    // "clean" ex) rustex clean -t ./testfile/test2.csv -r "^[2-3],"
     } else if let Some(matches) = matches.subcommand_matches("clean") {
         if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
             matches.value_of("target"),
@@ -350,7 +382,16 @@ fn main() {
                 "Status Code: {}, Message: {}",
                 result.status_code, result.message
             );
-            return;
+        }
+    // "collect" ex) rustex collect -t ./test -r "maru"
+    // "collect" ex) rustex collect -t ./test -r "^maru" ./collect
+    } else if let Some(matches) = matches.subcommand_matches("collect") {
+        if let (Some(target_dir), Some(output_dir), Some(regex_pattern)) = (
+            matches.value_of("target"),
+            matches.value_of("output"),
+            matches.value_of("regex"),
+        ) {
+            let _ = collect_file(target_dir, output_dir, regex_pattern);
         }
     }
 }
