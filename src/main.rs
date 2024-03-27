@@ -13,6 +13,7 @@ use rustex::{
     clean::clean_row,
     collect::collect_file,
     grep::grep_row,
+    blocksplit::block_split,
 };
 
 fn main() {
@@ -320,6 +321,38 @@ fn main() {
                         .takes_value(false)
                 ),
         )
+        .subcommand(
+            Command::new("blocksplit")
+                .about("Sorted CSV Block Split.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("colname")
+                        .short('c')
+                        .long("column")
+                        .value_name("COLUMN")
+                        .help("CSV split by column.")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .value_name("OUTPUT")
+                        .help("Output directory.")
+                        .required(false)
+                        .takes_value(true)
+                        .default_value(current_dir_str),
+                ),
+        )
         .get_matches();
 
 
@@ -450,6 +483,15 @@ fn main() {
                 let result = grep_row(target_file, regex_pattern, output_dir, false);
                 println!("Status: {} Message: {}", result.status_code, result.message);
             }
+        }
+    } else if let Some(matches) = matches.subcommand_matches("blocksplit") {
+        if let (Some(target_file), Some(target_column), Some(output_directory)) = (
+            matches.value_of("target"),
+            matches.value_of("colname"),
+            matches.value_of("output"),
+        ) {
+            let result = block_split(target_file, target_column, output_directory);
+            println!("Status: {} Message: {}", result.status_code, result.message);
         }
     }
 }

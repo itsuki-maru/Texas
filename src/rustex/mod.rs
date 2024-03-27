@@ -7,3 +7,4 @@ pub mod excol;
 pub mod clean;
 pub mod grep;
 pub mod collect;
+pub mod blocksplit;

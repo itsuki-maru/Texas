@@ -99,7 +99,9 @@ pub fn aggregate_csv_data(
     for &column in target_columns {
         println!("===== KEY COLUMN: {} =====", column);
         for (key, (sum, count)) in data.get(column).unwrap().iter() {
-            println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}", key, sum, count);
+            // 平均を算出
+            let average = sum / *count as f64;
+            println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", key, sum, count, average);
         }
     }
 
