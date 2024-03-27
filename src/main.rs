@@ -1,5 +1,6 @@
 use clap::{App, Arg, Command};
 use std::collections::HashSet;
+use std::env;
 mod rustex;
 mod scheme;
 mod utils;
@@ -13,7 +14,6 @@ use rustex::{
     collect::collect_file,
     grep::grep_row,
 };
-use std::env;
 
 fn main() {
     // カレントディレクトリを取得
