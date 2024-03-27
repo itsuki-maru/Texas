@@ -2,3 +2,8 @@ pub mod split;
 pub mod sortcsv;
 pub mod groupby;
 pub mod aggregate;
+pub mod head;
+pub mod excol;
+pub mod clean;
+pub mod grep;
+pub mod collect;

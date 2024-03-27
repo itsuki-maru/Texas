@@ -43,7 +43,7 @@ pub fn aggregate_csv_data(
         Ok(file) => file,
         Err(_) => {
             return StatusData {
-                status_code: 200,
+                status_code: 400,
                 message: "File read error.".to_string(),
             };
         }
