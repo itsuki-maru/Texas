@@ -215,7 +215,40 @@ fn main() {
                         .default_value(current_dir_str),
                 ),
         )
+        .subcommand(
+            Command::new("clean")
+                .about("Delete a file line based on a reguler expression.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("regex")
+                        .short('r')
+                        .long("regex")
+                        .value_name("REGEX")
+                        .help("Reguler expression for splitting.")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .value_name("OUTPUT")
+                        .help("Output directory.")
+                        .required(false)
+                        .takes_value(true)
+                        .default_value(current_dir_str),
+                ),
+        )
         .get_matches();
+
 
     // "split" ex) rustex split -t ./testfile/test1.txt -r "^第[1-9]章"
     if let Some(matches) = matches.subcommand_matches("split") {
@@ -231,6 +264,7 @@ fn main() {
             );
             return;
         }
+
     // "sortcsv" ex) rustex sortcsv -t ./testfile/test2.csv -c id
     // "sortcsv" ex) rustex sortcsv -t ./testfile/test2.csv -c id -r
     } else if let Some(matches) = matches.subcommand_matches("sortcsv") {
@@ -247,6 +281,7 @@ fn main() {
                 let _ = sort_csv_by_column(target_file, column_name, false);   
             }
         }
+
     // "groupby" ex) rustex groupby -t ./testfile/test2.csv -c name
     } else if let Some(matches) = matches.subcommand_matches("groupby") {
         if let (Some(target_file), Some(column_name)) = (
@@ -255,6 +290,7 @@ fn main() {
         ) {
             let _ = groupby_column_csv(target_file, column_name);
         }
+
     // "aggregate" ex) rustex aggregate -t ./testfile/test2.csv -k name -c score
     } else if let Some(matches) = matches.subcommand_matches("aggregate") {
         if let (Some(target_file), Some(key_column), Some(columns), floatmode) = (
@@ -270,6 +306,7 @@ fn main() {
                 let _ = aggregate_csv_data(target_file, key_column, &columns_str, false);
             }
         }
+
     // "head" ex) rustex head -t ./testfile/test2.csv -l 10
     // "head" ex) rustex head -t ./testfile/test2.csv -c
     } else if let Some(matches) = matches.subcommand_matches("head") {
@@ -289,6 +326,7 @@ fn main() {
                 
             }
         }
+
     // "excol" ex) rustex excol -t ./testfile/test2.csv -c name score
     } else if let Some(matches) = matches.subcommand_matches("excol") {
         if let (Some(target_file), Some(columns), Some(output_dir)) = (
@@ -298,6 +336,21 @@ fn main() {
          ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
             let _ = extract_column(target_file, columns_str, output_dir);
+        }
+    
+    // "clean" ex) rustex clean -t .\testfile\test2.csv -r "^[2-3],"
+    } else if let Some(matches) = matches.subcommand_matches("clean") {
+        if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
+            matches.value_of("target"),
+            matches.value_of("regex"),
+            matches.value_of("output"),
+        ) {
+            let result = clean_row(target_file, regex_pattrern, output_dir);
+            println!(
+                "Status Code: {}, Message: {}",
+                result.status_code, result.message
+            );
+            return;
         }
     }
 }
