@@ -14,6 +14,7 @@ use rustex::{
     collect::collect_file,
     grep::grep_row,
     blocksplit::block_split,
+    red::red,
 };
 
 fn main() {
@@ -353,6 +354,47 @@ fn main() {
                         .default_value(current_dir_str),
                 ),
         )
+        .subcommand(
+            Command::new("red")
+                .about("Replaced text reguler expression.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("regex")
+                        .short('r')
+                        .long("regex")
+                        .value_name("REGEX")
+                        .help("Reguler expression for splitting.")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("sed")
+                        .short('s')
+                        .long("sed")
+                        .value_name("SED")
+                        .help("Replaced text.")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .value_name("OUTPUT")
+                        .help("Output directory.")
+                        .required(false)
+                        .takes_value(true)
+                        .default_value(current_dir_str),
+                ),
+        )
         .get_matches();
 
 
@@ -455,6 +497,7 @@ fn main() {
             let result = clean_row(target_file, regex_pattrern, output_dir);
             println!("Status: {} Message: {}", result.status_code, result.message);
         }
+
     // "collect" ex) rustex collect -t ./test -r "maru"
     // "collect" ex) rustex collect -t ./test -r "^maru" ./collect
     } else if let Some(matches) = matches.subcommand_matches("collect") {
@@ -484,6 +527,8 @@ fn main() {
                 println!("Status: {} Message: {}", result.status_code, result.message);
             }
         }
+
+    // "blocksplit" ex) rustex blocksplit -t ./testfile/test3-blocksplit.txt -c id
     } else if let Some(matches) = matches.subcommand_matches("blocksplit") {
         if let (Some(target_file), Some(target_column), Some(output_directory)) = (
             matches.value_of("target"),
@@ -491,6 +536,18 @@ fn main() {
             matches.value_of("output"),
         ) {
             let result = block_split(target_file, target_column, output_directory);
+            println!("Status: {} Message: {}", result.status_code, result.message);
+        }
+
+    // "red" ex) rustex red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
+    } else if let Some(matches) = matches.subcommand_matches("red") {
+        if let (Some(target_file), Some(regex_pattern), Some(replaced_text), Some(output_directory)) = (
+            matches.value_of("target"),
+            matches.value_of("regex"),
+            matches.value_of("sed"),
+            matches.value_of("output"),
+        ) {
+            let result = red(target_file, regex_pattern, replaced_text, output_directory);
             println!("Status: {} Message: {}", result.status_code, result.message);
         }
     }

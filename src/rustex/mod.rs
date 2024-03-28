@@ -8,3 +8,4 @@ pub mod clean;
 pub mod grep;
 pub mod collect;
 pub mod blocksplit;
+pub mod red;

@@ -5,6 +5,7 @@ use std::fs::File;
 use super::super::utils::{get_abs_filepath, is_file};
 use crate::scheme::StatusData;
 
+// CSVファイルを集計する関数
 pub fn aggregate_csv_data(
     target_file: &str,
     key_column: &str,
