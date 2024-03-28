@@ -12,6 +12,7 @@ pub fn aggregate_csv_data(
     key_column: &str,
     target_columns: &[&str],
     floatmode: bool,
+    is_csv: bool,
 ) -> StatusData {
     // 対象ファイルの絶対パスを取得
     let target_file_abs = match get_abs_filepath(target_file) {
@@ -98,12 +99,25 @@ pub fn aggregate_csv_data(
     }
 
     // 結果を出力
-    for &column in target_columns {
-        println!("====================== KEY COLUMN: {} ======================", column);
-        for (key, (sum, count)) in data.get(column).unwrap().iter() {
-            // 平均を算出
-            let average = sum / *count as f64;
-            println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", key, sum, count, average);
+    if is_csv {
+        // CSV形式で出力
+        println!("CASE,TOTAL,COUNT,AVE");
+        for &column in target_columns {
+            for (key, (sum, count)) in data.get(column).unwrap().iter() {
+                // 平均を算出
+                let average = sum / *count as f64;
+                println!("{},{},{},{}", key, sum, count, average);
+            }
+        }
+    } else {
+        // 標準出力
+        for &column in target_columns {
+            println!("====================== KEY COLUMN: {} ======================", column);
+            for (key, (sum, count)) in data.get(column).unwrap().iter() {
+                // 平均を算出
+                let average = sum / *count as f64;
+                println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", key, sum, count, average);
+            }
         }
     }
 

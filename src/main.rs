@@ -147,8 +147,17 @@ fn main() {
                     Arg::new("floatmode")
                         .short('f')
                         .long("floatmode")
-                        .value_name("FLOATM ODE")
+                        .value_name("FLOAT MODE")
                         .help("Aggregate float.")
+                        .required(false)
+                        .takes_value(false)
+                )
+                .arg(
+                    Arg::new("iscsv")
+                        .short('i')
+                        .long("iscsv")
+                        .value_name("OUTPUT CSV")
+                        .help("Std Output To CSV.")
                         .required(false)
                         .takes_value(false)
                 ),
@@ -464,17 +473,26 @@ fn main() {
 
     // "aggregate" ex) rustex aggregate -t ./testfile/test2.csv -k name -c score
     } else if let Some(matches) = matches.subcommand_matches("aggregate") {
-        if let (Some(target_file), Some(key_column), Some(columns), floatmode) = (
+        if let (Some(target_file), Some(key_column), Some(columns), floatmode, is_csv) = (
             matches.value_of("target"),
             matches.value_of("keycol"),
             matches.get_many::<String>("columns"),
             matches.contains_id("floatmode"),
+            matches.contains_id("iscsv"),
          ) {
             let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
             if floatmode {
-                let _ = aggregate_csv_data(target_file, key_column, &columns_str, true);
+                if is_csv {
+                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, true, true);
+                } else {
+                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, true, false);
+                }
             } else {
-                let _ = aggregate_csv_data(target_file, key_column, &columns_str, false);
+                if is_csv {
+                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, false, true);
+                } else {
+                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, false, false);
+                }
             }
         }
 
