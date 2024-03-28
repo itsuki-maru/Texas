@@ -61,9 +61,9 @@ rustex collect -t ./test -r "^maru" ./collect
 
 ```shell
 # 「これは」で始まる行のみを残す
-rustex grep -t ./testfile/test1.txt -r ^これは`
+rustex grep -t ./testfile/test1.txt -r ^これは
 # CSVのヘッダー行を残して「1,」で始まる行を残す
-rustex grep -t ./testfile/test2.csv -r ^1,` -c
+rustex grep -t ./testfile/test2.csv -r ^1, -c
 ```
 
 ## blocksplit
