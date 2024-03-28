@@ -5,7 +5,8 @@ use std::fs::File;
 use super::super::utils::{get_abs_filepath, is_file};
 use crate::scheme::StatusData;
 
-// CSVファイルを集計する関数
+
+// CSVファイルを集計
 pub fn aggregate_csv_data(
     target_file: &str,
     key_column: &str,
@@ -98,7 +99,7 @@ pub fn aggregate_csv_data(
 
     // 結果を出力
     for &column in target_columns {
-        println!("===== KEY COLUMN: {} =====", column);
+        println!("====================== KEY COLUMN: {} ======================", column);
         for (key, (sum, count)) in data.get(column).unwrap().iter() {
             // 平均を算出
             let average = sum / *count as f64;

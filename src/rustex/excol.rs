@@ -8,7 +8,7 @@ use super::super::utils::{
     is_dir,
 };
 
-// CSVファイルの指定した列名のみを抽出
+// CSVファイルの指定した列名のみを抽出してファイルに保存
 pub fn extract_column(
     target_file: &str,
     col_names: HashSet<&str>,

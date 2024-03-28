@@ -6,7 +6,7 @@ use super::super::utils::{
     is_file,
 };
 
-// テキストファイルの先頭行を出力
+// テキストファイルの先頭行かCSVファイルのヘッダー行を出力
 pub fn print_head(
     target_file: &str,
     read_limit: usize,

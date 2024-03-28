@@ -15,6 +15,7 @@ use rustex::{
     grep::grep_row,
     blocksplit::block_split,
     red::red,
+    sum::sum,
 };
 
 fn main() {
@@ -395,6 +396,28 @@ fn main() {
                         .default_value(current_dir_str),
                 ),
         )
+        .subcommand(
+            Command::new("sum")
+                .about("SUM CSV Column.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("colname")
+                        .short('c')
+                        .long("column")
+                        .value_name("COLUMN")
+                        .help("CSV sum by column.")
+                        .required(true)
+                        .takes_value(true),
+                ),
+        )
         .get_matches();
 
 
@@ -549,6 +572,15 @@ fn main() {
         ) {
             let result = red(target_file, regex_pattern, replaced_text, output_directory);
             println!("Status: {} Message: {}", result.status_code, result.message);
+        }
+    
+    // "sum" rustex sum -t ./testfile/test2.csv -c score
+    }  else if let Some(matches) = matches.subcommand_matches("sum") {
+        if let (Some(target_file), Some(column_name)) = (
+            matches.value_of("target"),
+            matches.value_of("colname"),
+        ) {
+            let _ = sum(target_file, column_name);
         }
     }
 }

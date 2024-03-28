@@ -9,6 +9,7 @@ use super::super::utils::{
 };
 
 
+// 列名を指定し、その中の値の出現回数をカウント
 pub fn groupby_column_csv(
     target_file: &str,
     column_name: &str

@@ -10,7 +10,7 @@ use super::super::utils::{
 };
 
 
-// "split"
+// テキストファイルを正規表現に一致する行単位で分割
 pub fn split_file(
     target_file: &str,
     regex_pattrern: &str,

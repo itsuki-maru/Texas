@@ -9,3 +9,4 @@ pub mod grep;
 pub mod collect;
 pub mod blocksplit;
 pub mod red;
+pub mod sum;
