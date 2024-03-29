@@ -86,3 +86,15 @@ rustex red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
 # score列の値を全て加算
 rustex sum -t ./testfile/test2.csv -c score
 ```
+
+## ctoj
+
+```shell
+rustex ctoj -t ./testfile/test2.csv
+```
+
+## lastrow
+
+```shell
+rustex lastrow -t ./testfile/test1.txt
+```

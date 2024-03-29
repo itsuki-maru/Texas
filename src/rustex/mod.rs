@@ -10,3 +10,5 @@ pub mod collect;
 pub mod blocksplit;
 pub mod red;
 pub mod sum;
+pub mod csvtojson;
+pub mod lastrow;

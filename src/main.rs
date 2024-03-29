@@ -15,6 +15,8 @@ use rustex::{
     blocksplit::block_split,
     red::red,
     sum::sum,
+    csvtojson::csv_to_json,
+    lastrow::get_last_row,
 };
 
 fn main() {
@@ -426,6 +428,32 @@ fn main() {
                         .takes_value(true),
                 ),
         )
+        .subcommand(
+            Command::new("ctoj")
+                .about("CSV to JSON")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target CSV file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                ),
+        )
+        .subcommand(
+            Command::new("lastrow")
+                .about("Get last row for text file.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target CSV file (csv, txt)")
+                        .required(true)
+                        .takes_value(true),
+                ),
+        )
         .get_matches();
 
 
@@ -629,12 +657,30 @@ fn main() {
         }
     
     // "sum" rustex sum -t ./testfile/test2.csv -c score
-    }  else if let Some(matches) = matches.subcommand_matches("sum") {
+    } else if let Some(matches) = matches.subcommand_matches("sum") {
         if let (Some(target_file), Some(column_name)) = (
             matches.value_of("target"),
             matches.value_of("colname"),
         ) {
             match sum(target_file, column_name) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e)
+            }
+        }
+    
+    // "ctoj" ex) rustex ctoj -t ./testfile/test5-ctoj.csv
+    } else if let Some(matches) = matches.subcommand_matches("ctoj") {
+        if let Some(target_file) = matches.value_of("target") {
+            match csv_to_json(target_file) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e)
+            }
+        }
+    
+    // "lastrow" ex) rustex lastrow -t ./testfile/test1.txt
+    } else if let Some(matches) = matches.subcommand_matches("lastrow") {
+        if let Some(target_file) = matches.value_of("target") {
+            match get_last_row(target_file) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
             }
