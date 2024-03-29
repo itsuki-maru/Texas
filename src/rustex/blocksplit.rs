@@ -2,8 +2,7 @@ use csv::ReaderBuilder;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
-
-use crate::scheme::StatusData;
+use anyhow::{Result, anyhow};
 use super::super::utils::{
     get_abs_filepath,
     get_abs_directory_path,
@@ -17,61 +16,39 @@ pub fn block_split(
     target_file: &str,
     target_column: &str,
     output_directory: &str,
-) -> StatusData {
+) -> Result<String> {
 
     // 対象ファイルの絶対パスを取得
     let target_file_abs = match get_abs_filepath(target_file) {
         Ok(path) => path,
-        Err(_) => {
-            return StatusData {
-                status_code: 404,
-                message: format!("{} is not found.", target_file),
-            }
-        }
+        Err(_) => return Err(anyhow!("File absolute path get error."))
     };
 
     // ファイルの存在確認
     if !target_file_abs.exists() {
-        return StatusData {
-            status_code: 404,
-            message: format!("{} is not found.", target_file),
-        };
+        return Err(anyhow!(format!("{} is not exists.", target_file)))
     }
 
     // 指定されたファイルがファイルであることを確認
     if !is_file(&target_file_abs) {
-        return StatusData {
-            status_code: 400,
-            message: format!("{} is not csv file.", target_file),
-        };
+        return Err(anyhow!(format!("{} is not text file.", target_file)))
     }
 
     // 出力先の絶対パスを取得
     let output_directory_abs = match get_abs_directory_path(output_directory) {
         Ok(path) => path,
-        Err(_) => return StatusData {
-            status_code: 404,
-            message: format!("{} is not found.", output_directory),
-        },
+        Err(_) => return Err(anyhow!("Output directory absolute path get error."))
     };
 
     // 出力先がディレクトリか確認
     if !is_dir(&output_directory_abs) {
-        return StatusData {
-            status_code: 400,
-            message: format!("{} is not directory.", output_directory),    
-        };
+        return Err(anyhow!(format!("{} is not directory.", output_directory)))
     }
 
     // CSVリーダーを初期化
     let file = match File::open(target_file_abs) {
         Ok(file) => file,
-        Err(_) => {
-            return StatusData {
-                status_code: 400,
-                message: "File read error.".to_string(),
-            };
-        }
+        Err(_) => return Err(anyhow!("CSV file read error."))
     };
     let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
     // ヘッダーを取得
@@ -82,7 +59,7 @@ pub fn block_split(
         .iter()
         .position(|h| h == target_column)
         .ok_or_else(|| format!("Column name: `{}` not found.", target_column))
-        .expect("Error.");
+        .map_err(|e| anyhow!("Column index get error: {}", e))?;
 
     // 一時的にテキストデータを保持するベクタ
     let mut tmp_text_data: Vec<String> = Vec::new();
@@ -132,17 +109,14 @@ pub fn block_split(
         file_name_number += 1;
         let output_filename = format!("output/block_split_{}.csv", file_name_number);
         let base_path = Path::new(&output_filename).parent().expect("Get base path error.");
-        fs::create_dir_all(base_path).expect("parent directory create error.");
+        fs::create_dir_all(base_path).map_err(|e| anyhow!("Parent directory create error.: {}", e))?;
 
-        let mut file = File::create(&output_filename).expect("File create error.");
+        let mut file = File::create(&output_filename).map_err(|e| anyhow!("File create error.: {}", e))?;
         // ヘッダーを最初に書き込む
-        writeln!(file, "{}", headers.iter().collect::<Vec<&str>>().join(",")).expect("Header write error.");
+        writeln!(file, "{}", headers.iter().collect::<Vec<&str>>().join(",")).map_err(|e| anyhow!("Header write error.: {}", e))?;
         // 次にテキストデータを書き込む
-        writeln!(file, "{}", tmp_text_data.join("\n")).expect("Row write error.");
+        writeln!(file, "{}", tmp_text_data.join("\n")).map_err(|e| anyhow!("Row write error.: {}", e))?;
     }
 
-    StatusData {
-        status_code: 200,
-        message: "Block split CSV file successfully.".to_string(),
-    }
+    Ok("Complated.".to_string())
 }

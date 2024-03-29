@@ -2,7 +2,7 @@ use regex::Regex;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use crate::scheme::StatusData;
+use anyhow::{Result, anyhow};
 use super::super::utils::{
     get_abs_filepath,
     get_abs_directory_path,
@@ -15,58 +15,38 @@ pub fn split_file(
     target_file: &str,
     regex_pattrern: &str,
     output_directory: &str,
-) -> StatusData {
+) -> Result<String> {
 
     // 対象ファイルの絶対パスを取得
     let target_file_abs = match get_abs_filepath(target_file) {
         Ok(path) => path,
-        Err(_) => return StatusData {
-            status_code: 404,
-            message: format!("{} is not found.", target_file),
-        },
+        Err(_) => return Err(anyhow!("File absolute path get error."))
     };
 
     // ファイルの存在確認
     if !target_file_abs.exists() {
-        return StatusData {
-            status_code: 404,
-            message: format!("{} is not found.", target_file),    
-        };
+        return Err(anyhow!(format!("{} is not exists.", target_file)))
     }
 
     // 出力先の絶対パスを取得
     let output_directory_abs = match get_abs_directory_path(output_directory) {
         Ok(path) => path,
-        Err(_) => return StatusData {
-            status_code: 404,
-            message: format!("{} is not found.", output_directory),
-        },
+        Err(_) => return Err(anyhow!("Output directory absolute path get error."))
     };
 
     // 出力先がディレクトリか確認
     if !is_dir(&output_directory_abs) {
-        return StatusData {
-            status_code: 400,
-            message: format!("{} is not directory.", output_directory),    
-        };
+        return Err(anyhow!(format!("{} is not directory.", output_directory)))
     }
 
     // テキストファイルを読み込み
     let text = match fs::read_to_string(&target_file_abs) {
         Ok(content) => content,
-        Err(_) => return StatusData {
-            status_code: 500,
-            message: "Failed to read the file.".to_string(),
-        },
+        Err(e) => return Err(anyhow!("File read error.: {}", e))
     };
 
-    let re = match Regex::new(&regex_pattrern) {
-        Ok(r) => r,
-        Err(_) => return StatusData {
-            status_code: 500,
-            message: "Invalid regex pattern.".to_string(),
-        },
-    };
+    // 正規表現を初期化
+    let re = Regex::new(regex_pattrern).map_err(|e| anyhow!("Invalid regex pattern.: {}", e))?;
 
     // 行を格納するベクタを定義
     let lines = text.split("\n").collect::<Vec<_>>();
@@ -98,18 +78,11 @@ pub fn split_file(
             let write_data = result.join("\n");
 
             let output_path = output_directory_abs.join(&output_filename);
-            let mut f = match File::create(output_path) {
-                Ok(file) => file,
-                Err(_) => return StatusData {
-                    status_code: 500,
-                    message: format!("Failed to create file: {}", output_filename),
-                }
-            };
+
+            let mut f = File::create(output_path).map_err(|e| anyhow!("File create error: {}", e))?;
+
             if let Err(_) = f.write_all(write_data.as_bytes()) {
-                return StatusData {
-                    status_code: 500,
-                    message: format!("Failed to write to file: {}", output_filename),
-                };
+                return Err(anyhow!("Failed to write to file: {}", output_filename))
             }
 
             let tmp_index: u32 = *data_range.last().expect("Last index missing after write");
@@ -118,8 +91,5 @@ pub fn split_file(
             i += 1;
         }
     }
-    StatusData {
-        status_code: 200,
-        message: "File read successfully.".to_string(),
-    }
+    Ok("Complated".to_string())
 }

@@ -2,7 +2,6 @@ use clap::{App, Arg, Command};
 use std::collections::HashSet;
 use std::env;
 mod rustex;
-mod scheme;
 mod utils;
 use rustex::{
     aggregate::aggregate_csv_data,
@@ -437,12 +436,10 @@ fn main() {
             matches.value_of("regex"),
             matches.value_of("output"),
         ) {
-            let result = split_file(target_file, regex_pattrern, output_dir);
-            println!(
-                "Status Code: {}, Message: {}",
-                result.status_code, result.message
-            );
-            return;
+            match split_file(target_file, regex_pattrern, output_dir) {
+                Ok(message) => println!("{}", message),
+                Err(e) => println!("{}", e),
+            }
         }
 
     // "sortcsv" ex) rustex sortcsv -t ./testfile/test2.csv -c id
@@ -455,10 +452,16 @@ fn main() {
         ) {
             if is_reverse {
                 // 降順ソート
-                let _ = sort_csv_by_column(target_file, column_name, true);   
+                match sort_csv_by_column(target_file, column_name, true) {
+                    Ok(_) => {return},
+                    Err(e) => println!("{}", e)
+                }
             } else {
                 // 昇順ソート
-                let _ = sort_csv_by_column(target_file, column_name, false);   
+                match sort_csv_by_column(target_file, column_name, false) {
+                    Ok(_) => {return},
+                    Err(e) => println!("{}", e)
+                }
             }
         }
 
@@ -468,7 +471,10 @@ fn main() {
             matches.value_of("target"),
             matches.value_of("colname"),
         ) {
-            let _ = groupby_column_csv(target_file, column_name);
+            match groupby_column_csv(target_file, column_name) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e), 
+            }
         }
 
     // "aggregate" ex) rustex aggregate -t ./testfile/test2.csv -k name -c score
@@ -483,15 +489,27 @@ fn main() {
             let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
             if floatmode {
                 if is_csv {
-                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, true, true);
+                    match aggregate_csv_data(target_file, key_column, &columns_str, true, true) {
+                        Ok(_) => {return},
+                        Err(e) => println!("{}", e)
+                    }
                 } else {
-                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, true, false);
+                    match aggregate_csv_data(target_file, key_column, &columns_str, true, false) {
+                        Ok(_) => {return},
+                        Err(e) => println!("{}", e)
+                    }
                 }
             } else {
                 if is_csv {
-                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, false, true);
+                    match aggregate_csv_data(target_file, key_column, &columns_str, false, true) {
+                        Ok(_) => {return},
+                        Err(e) => println!("{}", e)
+                    }
                 } else {
-                    let _ = aggregate_csv_data(target_file, key_column, &columns_str, false, false);
+                    match aggregate_csv_data(target_file, key_column, &columns_str, false, false) {
+                        Ok(_) => {return},
+                        Err(e) => println!("{}", e)
+                    }
                 }
             }
         }
@@ -504,14 +522,19 @@ fn main() {
             matches.contains_id("iscsv"),
         ) {
             if iscsv {
-                let _ = print_header_csv(target_file);
+                match print_header_csv(target_file) {
+                    Ok(_) => {return},
+                    Err(e) => println!("{}", e)
+                }
             } else {
                 if let Some(read_limit) = matches.get_one::<usize>("limit").copied() {
                     match read_limit {
-                        n => print_head(target_file, n)
+                        n => match print_head(target_file, n) {
+                            Ok(_) => {return},
+                            Err(e) => println!("{}", e)
+                        }
                     };
                 }
-                
             }
         }
 
@@ -523,9 +546,10 @@ fn main() {
             matches.value_of("output"),
          ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
-            let result = extract_column(target_file, columns_str, output_dir);
-            println!("Status: {} Message: {}", result.status_code, result.message);
-
+            match extract_column(target_file, columns_str, output_dir) {
+                Ok(message) => println!("{}", message),
+                Err(e) => println!("{}", e),
+            }
         }
     
     // "clean" ex) rustex clean -t ./testfile/test2.csv -r "^[2-3],"
@@ -535,8 +559,10 @@ fn main() {
             matches.value_of("regex"),
             matches.value_of("output"),
         ) {
-            let result = clean_row(target_file, regex_pattrern, output_dir);
-            println!("Status: {} Message: {}", result.status_code, result.message);
+            match clean_row(target_file, regex_pattrern, output_dir) {
+                Ok(message) => println!("{}", message),
+                Err(e) => println!("{}", e),
+            }
         }
 
     // "collect" ex) rustex collect -t ./test -r "maru"
@@ -547,8 +573,10 @@ fn main() {
             matches.value_of("output"),
             matches.value_of("regex"),
         ) {
-            let result = collect_file(target_dir, output_dir, regex_pattern);
-            println!("Status: {} Message: {}", result.status_code, result.message);
+            match collect_file(target_dir, output_dir, regex_pattern) {
+                Ok(message) => println!("{}", message),
+                Err(e) => println!("{}", e)
+            }
         }
 
     // "grep" ex) rustex grep -t ./testfile/test1.txt -r ^これは`
@@ -561,11 +589,15 @@ fn main() {
             matches.contains_id("csv"),
         ) {
             if csv_header {
-                let result = grep_row(target_file, regex_pattern, output_dir, true);
-                println!("Status: {} Message: {}", result.status_code, result.message);
+                match grep_row(target_file, regex_pattern, output_dir, true) {
+                    Ok(message) => println!("{}", message),
+                    Err(e) => println!("{}", e)
+                }
             } else {
-                let result = grep_row(target_file, regex_pattern, output_dir, false);
-                println!("Status: {} Message: {}", result.status_code, result.message);
+                match grep_row(target_file, regex_pattern, output_dir, false) {
+                    Ok(message) => println!("{}", message),
+                    Err(e) => println!("{}", e)
+                }
             }
         }
 
@@ -576,8 +608,10 @@ fn main() {
             matches.value_of("colname"),
             matches.value_of("output"),
         ) {
-            let result = block_split(target_file, target_column, output_directory);
-            println!("Status: {} Message: {}", result.status_code, result.message);
+            match block_split(target_file, target_column, output_directory) {
+                Ok(message) => println!("{}", message),
+                Err(e) => println!("{}", e)
+            }
         }
 
     // "red" ex) rustex red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
@@ -588,8 +622,10 @@ fn main() {
             matches.value_of("sed"),
             matches.value_of("output"),
         ) {
-            let result = red(target_file, regex_pattern, replaced_text, output_directory);
-            println!("Status: {} Message: {}", result.status_code, result.message);
+            match red(target_file, regex_pattern, replaced_text, output_directory) {
+                Ok(message) => println!("{}", message),
+                Err(e) => println!("{}", e)
+            }
         }
     
     // "sum" rustex sum -t ./testfile/test2.csv -c score
@@ -598,7 +634,10 @@ fn main() {
             matches.value_of("target"),
             matches.value_of("colname"),
         ) {
-            let _ = sum(target_file, column_name);
+            match sum(target_file, column_name) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e)
+            }
         }
     }
 }
