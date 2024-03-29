@@ -17,6 +17,7 @@ use rustex::{
     sum::sum,
     csvtojson::csv_to_json,
     lastrow::get_last_row,
+    wc::{line_count, word_count},
 };
 
 fn main() {
@@ -454,6 +455,37 @@ fn main() {
                         .takes_value(true),
                 ),
         )
+        .subcommand(
+            Command::new("wc")
+                .about("Word count.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file.")
+                        .required(true)
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::new("chars")
+                        .short('m')
+                        .long("chars")
+                        .value_name("CHARS COUNT")
+                        .help("Text file chars count.")
+                        .required(false)
+                        .takes_value(false)
+                )
+                .arg(
+                    Arg::new("lines")
+                        .short('l')
+                        .long("lines")
+                        .value_name("LINE COUNT")
+                        .help("Text file lines count.(Does not include line breaks)")
+                        .required(false)
+                        .takes_value(false)
+                ),
+        )
         .get_matches();
 
 
@@ -683,6 +715,28 @@ fn main() {
             match get_last_row(target_file) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
+            }
+        }
+    
+    // "wc" ex) rustex lastrow -t ./testfile/test1.txt -l
+    // "wc" ex) rustex lastrow -t ./testfile/test1.txt -m
+    } else if let Some(matches) = matches.subcommand_matches("wc") {
+        if let (Some(target_file), chars, lines) = (
+            matches.value_of("target"),
+            matches.contains_id("chars"),
+            matches.contains_id("lines"),
+        
+        ) {
+            if chars {
+                match word_count(target_file) {
+                    Ok(_) => {return},
+                    Err(e) => println!("{}", e)
+                }
+            } else if lines {
+                match line_count(target_file) {
+                    Ok(_) => {return},
+                    Err(e) => println!("{}", e)
+                }
             }
         }
     }

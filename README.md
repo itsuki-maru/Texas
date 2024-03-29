@@ -98,3 +98,12 @@ rustex ctoj -t ./testfile/test2.csv
 ```shell
 rustex lastrow -t ./testfile/test1.txt
 ```
+
+## wx
+
+```shell
+# 行数をカウント（最後の改行は含まない）
+rustex lastrow -t ./testfile/test1.txt -l
+# 文字数をカウント（改行コードなどは含まない）
+rustex lastrow -t ./testfile/test1.txt -m
+```

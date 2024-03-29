@@ -12,3 +12,4 @@ pub mod red;
 pub mod sum;
 pub mod csvtojson;
 pub mod lastrow;
+pub mod wc;
