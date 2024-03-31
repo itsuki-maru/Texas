@@ -64,7 +64,7 @@ pub fn aggregate_csv_data(
 
         // 集計対象の列番号の数だけ繰り返す
         for column in &target_columns_indexes {
-            // レコードから列番号の値を取得
+            // レコードから列番号の値を取得（&usize（usizeの参照）をusize（値そのもの）に参照の内容をデリファレンス（参照外し））
             let value_str = record.get(*column).unwrap_or("0");
             // 小数点モードか否かでパースする値を変更
             let value = if floatmode {
