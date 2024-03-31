@@ -73,9 +73,12 @@ pub fn aggregate_csv_data(
                 value_str.parse::<f64>().unwrap_or(0.0) as f64
             };
 
-            // データを追加
+            // data.entryで集計対象の現在の合計と出現回数を取り出すが集計対象がHashMapに存在しなければ新たなHashMap{}を作成
             let entry = data.entry(column.to_string()).or_insert_with(HashMap::new);
+            // 集計対象の現在の合計と出現回数が空であれば(0.0, 0)を挿入
             let counts = entry.entry(key.clone()).or_insert((0.0, 0));
+
+            // 集計対象の現在の合計と出現回数に加算
             counts.0 += value;
             counts.1 += 1;
         }
