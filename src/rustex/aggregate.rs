@@ -37,71 +37,81 @@ pub fn aggregate_csv_data(
     let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
 
     // ヘッダーを取得
-    let headers = reader.headers()
-        .map_err(|e| anyhow!("Header get error: {}", e))?
+    let headers = reader.headers()?
         .clone();
 
     // key_columnのインデックスを見つける
     let key_column_index = headers
         .iter()
         .position(|h| h == key_column)
-        .ok_or_else(|| format!("Column name: `{}` not found.", key_column))
-        .map_err(|e| anyhow!("Column index get error: {}", e))?;
+        .ok_or_else(|| anyhow!("Column name: `{}` not found.", key_column))?;
+
+    // 計算対象の列のインデックスを事前に計算
+    let target_columns_indexes = target_columns.iter()
+        .map(|&column| {
+            headers.iter().position(|h| h == column)
+                .ok_or_else(|| anyhow!("Column name: `{}` not found.", column))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
 
     // 各キーに対する合計と件数を保持するHashMap
     let mut data: HashMap<String, HashMap<String, (f64, u32)>> = HashMap::new();
 
     // レコードをイテレート
     for result in reader.records() {
-        let record = result.expect("CSV Error.");
-        let key = record.get(key_column_index).unwrap_or_default();
+        let record = result?;
+        let key = record.get(key_column_index).unwrap_or_default().to_string();
 
-        // ここでtarget_columnsは&strのスライスと仮定
-        for &column in target_columns {
-            // columnに対応するHashMapがなければ、新しく作成
-            data.entry(column.to_string()).or_insert_with(HashMap::new);
+        // 集計対象の列番号の数だけ繰り返す
+        for column in &target_columns_indexes {
+            // レコードから列番号の値を取得
+            let value_str = record.get(*column).unwrap_or("0");
+            // 小数点モードか否かでパースする値を変更
+            let value = if floatmode {
+                value_str.parse::<f64>().unwrap_or(0.0)
+            } else {
+                value_str.parse::<f64>().unwrap_or(0.0) as f64
+            };
 
-            // ここで再度`get_mut`を呼び出す必要がある
-            let column_map = data.get_mut(column).expect("Just inserted, should exist");
-
-            let column_index = headers
-                .iter()
-                .position(|h| h == column)
-                .expect(&format!("Column name: `{}` not found.", column));
-
-            if let Some(value_str) = record.get(column_index) {
-                let value = if floatmode {
-                    value_str.parse::<f64>().unwrap_or(0.0)
-                } else {
-                    value_str.parse::<f64>().unwrap_or(0.0) // Rustではintとfloatの区別が厳密なため
-                };
-
-                let entry = column_map.entry(key.to_string()).or_insert((0.0, 0));
-                entry.0 += value;
-                entry.1 += 1;
-            }
+            // データを追加
+            let entry = data.entry(column.to_string()).or_insert_with(HashMap::new);
+            let counts = entry.entry(key.clone()).or_insert((0.0, 0));
+            counts.0 += value;
+            counts.1 += 1;
         }
+
     }
 
     // 結果を出力
     if is_csv {
         // CSV形式で出力
-        println!("CASE,TOTAL,COUNT,AVE");
-        for &column in target_columns {
-            for (key, (sum, count)) in data.get(column).unwrap().iter() {
-                // 平均を算出
-                let average = sum / *count as f64;
-                println!("{},{},{},{}", key, sum, count, average);
+        for case in target_columns_indexes.iter() {
+            let key_column = match headers.get(*case) {
+                Some(col_name) => col_name,
+                None => return Err(anyhow!("Column name: `{}` not found.", key_column)),
+            };
+            println!("========== {} ==========", key_column);
+            println!("CASE,TOTAL,COUNT,AVE");
+            if let Some(inner_map) = data.get(&case.to_string()) {
+                for item in inner_map.iter() {
+                    let average = item.1.0 / item.1.1 as f64;
+                    println!("{},{},{},{}", item.0, item.1.0, item.1.1, average);
+                }
             }
         }
     } else {
         // 標準出力
-        for &column in target_columns {
-            println!("====================== KEY COLUMN: {} ======================", column);
-            for (key, (sum, count)) in data.get(column).unwrap().iter() {
-                // 平均を算出
-                let average = sum / *count as f64;
-                println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", key, sum, count, average);
+        for case in target_columns_indexes.iter() {
+            let key_column = match headers.get(*case) {
+                Some(col_name) => col_name,
+                None => return Err(anyhow!("Column name: `{}` not found.", key_column)),
+            };
+            println!("====================== KEY COLUMN: {} ======================", key_column);
+            if let Some(inner_map) = data.get(&case.to_string()) {
+                for item in inner_map.iter() {
+                    let average = item.1.0 / item.1.1 as f64;
+                    println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", item.0, item.1.0, item.1.1, average);
+                }
             }
         }
     }
