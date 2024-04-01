@@ -79,8 +79,7 @@ pub fn print_header_csv(
         .from_reader(file);
 
     // ヘッダーを取得
-    let headers = reader.headers()
-        .map_err(|e| anyhow!("Header get error: {}", e))?
+    let headers = reader.headers()?
         .clone();
 
     for (i, header) in headers.iter().enumerate() {

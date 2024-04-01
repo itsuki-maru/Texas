@@ -38,14 +38,14 @@ pub fn groupby_column_csv(
     let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
 
     // ヘッダーを取得
-    let headers = reader.headers()
-        .map_err(|e| anyhow!("Header get error: {}", e))?
+    let headers = reader.headers()?
         .clone();
     
     // 列名から列のインデックスを見つける
-    let column_index = headers.iter().position(|h| h == column_name)
-        .ok_or_else(|| format!("Column name: `{}` not found.", column_name))
-        .map_err(|e| anyhow!("Header index get error: {}", e))?;
+    let column_index = headers
+        .iter()
+        .position(|h| h == column_name)
+        .ok_or_else(|| anyhow!("Column name: `{}` not found.", column_name))?;
 
     // 出現回数をカウントするHashMapを初期化
     let mut counts: HashMap<String, u32> = HashMap::new();

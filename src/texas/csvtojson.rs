@@ -43,8 +43,7 @@ pub fn csv_to_json(
     let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
 
     // ヘッダーを取得
-    let headers = reader.headers()
-        .map_err(|e| anyhow!("Header get error: {}", e))?
+    let headers = reader.headers()?
         .clone();
 
     // データを格納するベクタを初期化

@@ -45,8 +45,7 @@ pub fn extract_column(
     let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
     
     // ヘッダーを取得
-    let headers = reader.headers()
-        .map_err(|e| anyhow!("Header get error: {}", e))?
+    let headers = reader.headers()?
         .clone();
 
     // 対応するインデックス番号を取得

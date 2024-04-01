@@ -42,16 +42,14 @@ pub fn sum(
     let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
 
     // ヘッダーを取得
-    let headers = reader.headers()
-        .map_err(|e| anyhow!("Header get error: {}", e))?
+    let headers = reader.headers()?
         .clone();
 
     // target_columnのインデックスを見つける
     let target_column_index = headers
         .iter()
         .position(|h| h == target_column)
-        .ok_or_else(|| format!("Column name: `{}` not found.", target_column))
-        .map_err(|e| anyhow!("Header index get error: {}", e))?;
+        .ok_or_else(|| anyhow!("Column name: `{}` not found.", target_column))?;
 
     // sum: 最終的な集計値
     // count: データ件数（ヘッダー行を除外するためにここで加算）
