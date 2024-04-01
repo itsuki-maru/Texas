@@ -3,7 +3,7 @@
 指定した正規表現に一致する文字列で複数ファイルに分割する。サブコマンドに`split`を設定して使用。また`-t`オプションでターゲットとなるテキストファイルを指定し、`-r`オプションで正規表現を指定する。
 
 ```shell
-rustex split -t ./testfile/test1.txt -r "^第[1-9]章"
+texas split -t ./testfile/test1.txt -r "^第[1-9]章"
 ```
 
 ## sortcsv
@@ -12,9 +12,9 @@ rustex split -t ./testfile/test1.txt -r "^第[1-9]章"
 
 ```shell
 # 昇順
-rustex sortcsv -t ./testfile/test2.csv -c id
+texas sortcsv -t ./testfile/test2.csv -c id
 # 降順
-rustex sortcsv -t ./testfile/test2.csv -c id -r
+texas sortcsv -t ./testfile/test2.csv -c id -r
 ```
 
 ## groupby
@@ -22,7 +22,7 @@ rustex sortcsv -t ./testfile/test2.csv -c id -r
 CSVファイルの列内データの出現回数をカウントする。
 
 ```shell
-rustex groupby -t ./testfile/test2.csv -c name
+texas groupby -t ./testfile/test2.csv -c name
 ```
 
 ## agrregate
@@ -30,7 +30,7 @@ rustex groupby -t ./testfile/test2.csv -c name
 CSVファイルのキー列と集計対象列（複数指定可能）を指定して合計とデータの個数を集計し、標準出力する。`-c`オプションでカンマ区切りで出力。
 
 ```shell
-rustex aggregate -t ./testfile/test2.csv -k name -c score use
+texas aggregate -t ./testfile/test2.csv -k name -c score use
 ```
 
 ## head
@@ -39,9 +39,9 @@ rustex aggregate -t ./testfile/test2.csv -k name -c score use
 
 ```shell
 # 10行出力
-rustex head -t ./testfile/test2.csv -l 10
+texas head -t ./testfile/test2.csv -l 10
 # CSVファイルのヘッダとインデックス番号を出力
-rustex head -t ./testfile/test2.csv -c
+texas head -t ./testfile/test2.csv -c
 ```
 
 ## excol
@@ -50,7 +50,7 @@ CSVファイルの指定した列のみを抽出する。
 
 ```shell
 # nameとscore列のみ抽出
-rustex excol -t ./testfile/test2.csv -c name score
+texas excol -t ./testfile/test2.csv -c name score
 ```
 
 ## clean
@@ -59,7 +59,7 @@ rustex excol -t ./testfile/test2.csv -c name score
 
 ```shell
 # 先頭文字が2か3で始まる行を削除
-rustex clean -t ./testfile/test2.csv -r "^[2-3],"
+texas clean -t ./testfile/test2.csv -r "^[2-3],"
 ```
 
 ## collect
@@ -68,9 +68,9 @@ rustex clean -t ./testfile/test2.csv -r "^[2-3],"
 
 ```shell
 # maruという文字を含むテキストファイルを収集
-rustex collect -t ./test -r "maru"
+texas collect -t ./test -r "maru"
 # maruという文字を含むテキストファイルを収集し、collectというフォルダに出力
-rustex collect -t ./test -r "^maru" ./collect
+texas collect -t ./test -r "^maru" ./collect
 ```
 
 ## grep
@@ -79,9 +79,9 @@ rustex collect -t ./test -r "^maru" ./collect
 
 ```shell
 # 「これは」で始まる行のみを残す
-rustex grep -t ./testfile/test1.txt -r ^これは
+texas grep -t ./testfile/test1.txt -r ^これは
 # CSVのヘッダー行を残して「1,」で始まる行を残す
-rustex grep -t ./testfile/test2.csv -r ^1, -c
+texas grep -t ./testfile/test2.csv -r ^1, -c
 ```
 
 ## blocksplit
@@ -90,7 +90,7 @@ CSVファイルの列を指定し、値が一致する部分を塊でファイ�
 
 ```shell
 # idの値毎にファイルに分割して出力
-rustex blocksplit -t ./testfile/test3-blocksplit.txt -c id
+texas blocksplit -t ./testfile/test3-blocksplit.txt -c id
 ```
 
 ## red
@@ -99,7 +99,7 @@ rustex blocksplit -t ./testfile/test3-blocksplit.txt -c id
 
 ```shell
 # 「Rust」という文字を「Rust言語」に置換
-rustex red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
+texas red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
 ```
 
 ## sum
@@ -108,7 +108,7 @@ CSVファイルの指定列の値を合計する。
 
 ```shell
 # score列の値を全て加算
-rustex sum -t ./testfile/test2.csv -c score
+texas sum -t ./testfile/test2.csv -c score
 ```
 
 ## ctoj
@@ -116,7 +116,7 @@ rustex sum -t ./testfile/test2.csv -c score
 CSVファイルをJSONに変換して標準出力する。同じ列名が存在する場合は配列として出力。
 
 ```shell
-rustex ctoj -t ./testfile/test2.csv
+texas ctoj -t ./testfile/test2.csv
 ```
 
 ## lastrow
@@ -124,7 +124,7 @@ rustex ctoj -t ./testfile/test2.csv
 テキストファイルの最終行のみをファイルに抜き出す。
 
 ```shell
-rustex lastrow -t ./testfile/test1.txt
+texas lastrow -t ./testfile/test1.txt
 ```
 
 ## wc
@@ -133,7 +133,7 @@ rustex lastrow -t ./testfile/test1.txt
 
 ```shell
 # 行数をカウント（最後の改行は含まない）
-rustex wc -t ./testfile/test1.txt -l
+texas wc -t ./testfile/test1.txt -l
 # 文字数をカウント（改行コードなどは含まない）
-rustex wc -t ./testfile/test1.txt -m
+texas wc -t ./testfile/test1.txt -m
 ```

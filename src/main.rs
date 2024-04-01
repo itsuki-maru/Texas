@@ -1,9 +1,9 @@
 use clap::{App, Arg, Command};
 use std::collections::HashSet;
 use std::env;
-mod rustex;
+mod texas;
 mod utils;
-use rustex::{
+use texas::{
     aggregate::aggregate_csv_data,
     groupby::groupby_column_csv,
     head::{print_head, print_header_csv},
@@ -25,7 +25,7 @@ fn main() {
     let current_directory = env::current_dir().expect("Current Directoru Get Error.");
     let current_dir_str = current_directory.to_str().unwrap_or("Invalied Path.");
 
-    let matches = App::new("rustex")
+    let matches = App::new("texas")
         .version("1.0")
         .author("Itsuki Maru")
         .about("Text file proessing tool.")
@@ -489,7 +489,7 @@ fn main() {
         .get_matches();
 
 
-    // "split" ex) rustex split -t ./testfile/test1.txt -r "^第[1-9]章"
+    // "split" ex) texas split -t ./testfile/test1.txt -r "^第[1-9]章"
     if let Some(matches) = matches.subcommand_matches("split") {
         if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
             matches.value_of("target"),
@@ -502,8 +502,8 @@ fn main() {
             }
         }
 
-    // "sortcsv" ex) rustex sortcsv -t ./testfile/test2.csv -c id
-    // "sortcsv" ex) rustex sortcsv -t ./testfile/test2.csv -c id -r
+    // "sortcsv" ex) texas sortcsv -t ./testfile/test2.csv -c id
+    // "sortcsv" ex) texas sortcsv -t ./testfile/test2.csv -c id -r
     } else if let Some(matches) = matches.subcommand_matches("sortcsv") {
         if let (Some(target_file), Some(column_name), is_reverse) = (
             matches.value_of("target"),
@@ -525,7 +525,7 @@ fn main() {
             }
         }
 
-    // "groupby" ex) rustex groupby -t ./testfile/test2.csv -c name
+    // "groupby" ex) texas groupby -t ./testfile/test2.csv -c name
     } else if let Some(matches) = matches.subcommand_matches("groupby") {
         if let (Some(target_file), Some(column_name)) = (
             matches.value_of("target"),
@@ -537,7 +537,7 @@ fn main() {
             }
         }
 
-    // "aggregate" ex) rustex aggregate -t ./testfile/test2.csv -k name -c score
+    // "aggregate" ex) texas aggregate -t ./testfile/test2.csv -k name -c score
     } else if let Some(matches) = matches.subcommand_matches("aggregate") {
         if let (Some(target_file), Some(key_column), Some(columns), floatmode, is_csv) = (
             matches.value_of("target"),
@@ -574,8 +574,8 @@ fn main() {
             }
         }
 
-    // "head" ex) rustex head -t ./testfile/test2.csv -l 10
-    // "head" ex) rustex head -t ./testfile/test2.csv -c
+    // "head" ex) texas head -t ./testfile/test2.csv -l 10
+    // "head" ex) texas head -t ./testfile/test2.csv -c
     } else if let Some(matches) = matches.subcommand_matches("head") {
         if let (Some(target_file), iscsv) = (
             matches.value_of("target"),
@@ -598,7 +598,7 @@ fn main() {
             }
         }
 
-    // "excol" ex) rustex excol -t ./testfile/test2.csv -c name score
+    // "excol" ex) texas excol -t ./testfile/test2.csv -c name score
     } else if let Some(matches) = matches.subcommand_matches("excol") {
         if let (Some(target_file), Some(columns), Some(output_dir)) = (
             matches.value_of("target"),
@@ -612,7 +612,7 @@ fn main() {
             }
         }
     
-    // "clean" ex) rustex clean -t ./testfile/test2.csv -r "^[2-3],"
+    // "clean" ex) texas clean -t ./testfile/test2.csv -r "^[2-3],"
     } else if let Some(matches) = matches.subcommand_matches("clean") {
         if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
             matches.value_of("target"),
@@ -625,8 +625,8 @@ fn main() {
             }
         }
 
-    // "collect" ex) rustex collect -t ./test -r "maru"
-    // "collect" ex) rustex collect -t ./test -r "^maru" ./collect
+    // "collect" ex) texas collect -t ./test -r "maru"
+    // "collect" ex) texas collect -t ./test -r "^maru" ./collect
     } else if let Some(matches) = matches.subcommand_matches("collect") {
         if let (Some(target_dir), Some(output_dir), Some(regex_pattern)) = (
             matches.value_of("target"),
@@ -639,8 +639,8 @@ fn main() {
             }
         }
 
-    // "grep" ex) rustex grep -t ./testfile/test1.txt -r ^これは`
-    // "grep" ex) rustex grep -t ./testfile/test2.csv -r ^1,` -c
+    // "grep" ex) texas grep -t ./testfile/test1.txt -r ^これは`
+    // "grep" ex) texas grep -t ./testfile/test2.csv -r ^1,` -c
     } else if let Some(matches) = matches.subcommand_matches("grep") {
         if let (Some(target_file), Some(regex_pattern), Some(output_dir), csv_header) = (
             matches.value_of("target"),
@@ -661,7 +661,7 @@ fn main() {
             }
         }
 
-    // "blocksplit" ex) rustex blocksplit -t ./testfile/test3-blocksplit.txt -c id
+    // "blocksplit" ex) texas blocksplit -t ./testfile/test3-blocksplit.txt -c id
     } else if let Some(matches) = matches.subcommand_matches("blocksplit") {
         if let (Some(target_file), Some(target_column), Some(output_directory)) = (
             matches.value_of("target"),
@@ -674,7 +674,7 @@ fn main() {
             }
         }
 
-    // "red" ex) rustex red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
+    // "red" ex) texas red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
     } else if let Some(matches) = matches.subcommand_matches("red") {
         if let (Some(target_file), Some(regex_pattern), Some(replaced_text), Some(output_directory)) = (
             matches.value_of("target"),
@@ -688,7 +688,7 @@ fn main() {
             }
         }
     
-    // "sum" rustex sum -t ./testfile/test2.csv -c score
+    // "sum" texas sum -t ./testfile/test2.csv -c score
     } else if let Some(matches) = matches.subcommand_matches("sum") {
         if let (Some(target_file), Some(column_name)) = (
             matches.value_of("target"),
@@ -700,7 +700,7 @@ fn main() {
             }
         }
     
-    // "ctoj" ex) rustex ctoj -t ./testfile/test5-ctoj.csv
+    // "ctoj" ex) texas ctoj -t ./testfile/test5-ctoj.csv
     } else if let Some(matches) = matches.subcommand_matches("ctoj") {
         if let Some(target_file) = matches.value_of("target") {
             match csv_to_json(target_file) {
@@ -709,7 +709,7 @@ fn main() {
             }
         }
     
-    // "lastrow" ex) rustex lastrow -t ./testfile/test1.txt
+    // "lastrow" ex) texas lastrow -t ./testfile/test1.txt
     } else if let Some(matches) = matches.subcommand_matches("lastrow") {
         if let Some(target_file) = matches.value_of("target") {
             match get_last_row(target_file) {
@@ -718,8 +718,8 @@ fn main() {
             }
         }
     
-    // "wc" ex) rustex lastrow -t ./testfile/test1.txt -l
-    // "wc" ex) rustex lastrow -t ./testfile/test1.txt -m
+    // "wc" ex) texas lastrow -t ./testfile/test1.txt -l
+    // "wc" ex) texas lastrow -t ./testfile/test1.txt -m
     } else if let Some(matches) = matches.subcommand_matches("wc") {
         if let (Some(target_file), chars, lines) = (
             matches.value_of("target"),
