@@ -1,6 +1,7 @@
 use csv::ReaderBuilder;
 use std::collections::HashMap;
 use std::fs::File;
+use num_format::{Locale, ToFormattedString};
 use anyhow::{Result, anyhow};
 use super::super::utils::{get_abs_filepath, is_file};
 
@@ -112,8 +113,23 @@ pub fn aggregate_csv_data(
             println!("====================== KEY COLUMN: {} ======================", key_column);
             if let Some(inner_map) = data.get(&case.to_string()) {
                 for item in inner_map.iter() {
+                    // total(f64)のフォーマット
+                    let total_integet_part = item.1.0.trunc() as i64;
+                    let total_decimal_part = item.1.0.fract();
+                    let formatted_total_integer = total_integet_part.to_formatted_string(&Locale::en);
+                    let formatted_total = format!("{}{}", formatted_total_integer, format!("{:.3}", total_decimal_part).trim_start_matches('0'));
+
+                    // count(i32)のフォーマット
+                    let count_formatted = item.1.1.to_formatted_string(&Locale::en);
+
+                    // 平均値のフォーマット
                     let average = item.1.0 / item.1.1 as f64;
-                    println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", item.0, item.1.0, item.1.1, average);
+                    let average_integet_part = average.trunc() as i64;
+                    let average_decimal_part = average.fract();
+                    let formatted_average_integer = average_integet_part.to_formatted_string(&Locale::en);
+                    let formatted_average = format!("{}{}", formatted_average_integer, format!("{:.3}", average_decimal_part).trim_start_matches('0'));
+
+                    println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", item.0, formatted_total, count_formatted, formatted_average);
                 }
             }
         }
