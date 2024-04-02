@@ -57,3 +57,21 @@ pub fn is_file<P: AsRef<Path>>(path: P) -> bool {
 pub fn is_dir<P: AsRef<Path>>(path: P) -> bool {
     fs::metadata(path).map(|metadata| metadata.is_dir()).unwrap_or(false)
 }
+
+// 数字のフォーマット
+pub fn format_with_connma(number: i64) -> String {
+    let num_str = number.to_string();
+    let mut result = String::new();
+    // 数字を分解して配列にベクタに格納
+    let chars: Vec<char> = num_str.chars().rev().collect();
+
+    // 3桁ごとにカンマをベクタに追加
+    for (i, ch) in chars.iter().enumerate() {
+        if i % 3 == 0 && i != 0 {
+            result.push(',');
+        }
+        result.push(*ch);
+    }
+    // 結合して返却
+    result.chars().rev().collect()
+}

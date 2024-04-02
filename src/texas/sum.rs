@@ -2,8 +2,7 @@ use csv::ReaderBuilder;
 use std::fs::File;
 use serde::Deserialize;
 use anyhow::{Result, anyhow};
-use num_format::{Locale, ToFormattedString};
-use super::super::utils::{get_abs_filepath, is_file};
+use super::super::utils::{get_abs_filepath, is_file, format_with_connma};
 
 // 動的に型を扱うための列挙型
 #[derive(Debug, Deserialize)]
@@ -81,11 +80,14 @@ pub fn sum(
     // total(f64)のフォーマット
     let total_integet_part = sum.trunc() as i64;
     let total_decimal_part = sum.fract();
-    let formatted_total_integer = total_integet_part.to_formatted_string(&Locale::en);
+    let formatted_total_integer = format_with_connma(total_integet_part);
     let formatted_total = format!("{}{}", formatted_total_integer, format!("{:.2}", total_decimal_part).trim_start_matches('0'));
 
+    // count(usize)のフォーマット
+    let formatted_count = format_with_connma(count as i64);
+
     println!("===== COLUMN: {} =====", target_column);
-    println!("SUM: {} COUNT: {}", formatted_total, count.to_formatted_string(&Locale::en));
+    println!("SUM: {} COUNT: {}", formatted_total, formatted_count);
 
     Ok(())
 }
