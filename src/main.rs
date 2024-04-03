@@ -31,7 +31,7 @@ fn main() {
         .about("Text file proessing tool.")
         .subcommand(
             Command::new("texas")
-                .about("Splits a file based on a reguler expression.")
+                .about("Welcome!!")
         )
         .subcommand(
             Command::new("split")
