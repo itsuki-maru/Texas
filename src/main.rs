@@ -30,6 +30,10 @@ fn main() {
         .author("Itsuki Maru")
         .about("Text file proessing tool.")
         .subcommand(
+            Command::new("texas")
+                .about("Splits a file based on a reguler expression.")
+        )
+        .subcommand(
             Command::new("split")
                 .about("Splits a file based on a reguler expression.")
                 .arg(
@@ -488,9 +492,23 @@ fn main() {
         )
         .get_matches();
 
+    // Welcome Command
+    if let Some(_) = matches.subcommand_matches("texas") {
+        let texs = vec![
+            "\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+",
+            "|T|T|T|T|T| |E|E|E|E|E| |X| | | |X| | | |A| | | |S|S|S|S|",
+            "| | |T| | | |E| | | | | | |X| |X| | | | A A | | |S| | | |",
+            "| | |T| | | |E|E|E|E|E| | | |X| | | | |A| |A| | |S|S|S|S|",
+            "| | |T| | | |E| | | | | | |X| |X| | | A |A| A | | | | |S|",
+            "| | |T| | | |E|E|E|E|E| |X| | | |X| |A| | | |A| |S|S|S|S|",
+            "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
+        ];
+        for row in texs.iter() {
+            println!("{}", row);
+        }
 
-    // "split" ex) texas split -t ./testfile/test1.txt -r "^第[1-9]章"
-    if let Some(matches) = matches.subcommand_matches("split") {
+     // "split" ex) texas split -t ./testfile/test1.txt -r "^第[1-9]章"
+    } else if let Some(matches) = matches.subcommand_matches("split") {
         if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
             matches.value_of("target"),
             matches.value_of("regex"),
