@@ -52,7 +52,7 @@ pub fn split_file(
     let lines = text.split("\n").collect::<Vec<_>>();
 
     // lines.iter().enumerate(): linesベクタの各要素に対してイテレーション（繰り返し処理）を行い、enumerateメソッドを用いてそれぞれの要素にインデックス番号を付与
-    // enumerateは各要素をタプル(i, line)の形で返します。ここでiは要素のインデックス（0から始まる）、lineはその要素の値（ここではファイルの各行のテキスト）
+    // enumerateは各要素をタプル(i, line)の形で返す。ここでiは要素のインデックス（0から始まる）、lineはその要素の値（ここではファイルの各行のテキスト）
     // filter_mapメソッドは、イテレータの各要素に対して関数を適用し、その関数がSome(value)を返した場合のみ、valueを新しいイテレータの要素として収集
     // 正規表現reにマッチする行に対してのみ、その行のインデックス（i）をu32型にキャストしてSome(i as u32)として返す。マッチしない行はNoneを返し、その結果これらの行は無視
     let mut index_list: Vec<u32> = lines.iter().enumerate().filter_map(|(i, line)| {
