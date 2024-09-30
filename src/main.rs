@@ -748,8 +748,8 @@ fn main() {
             }
         }
     
-    // "wc" ex) texas lastrow -t ./testfile/test1.txt -l
-    // "wc" ex) texas lastrow -t ./testfile/test1.txt -m
+    // "wc" ex) texas wc -t ./testfile/test1.txt -l
+    // "wc" ex) texas wc -t ./testfile/test1.txt -m
     } else if let Some(matches) = matches.subcommand_matches("wc") {
         if let (Some(target_file), chars, lines) = (
             matches.get_one::<String>("target"),

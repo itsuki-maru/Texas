@@ -1,5 +1,4 @@
 use csv::ReaderBuilder;
-use serde::Serialize;
 use serde_json;
 use std::collections::HashMap;
 use std::fs::File;
@@ -8,12 +7,6 @@ use super::super::utils::{
     get_abs_filepath,
     is_file,
 };
-
-// データを格納するための構造体
-#[derive(Serialize)]
-struct Record {
-    data: Vec<HashMap<String, String>>,
-}
 
 pub fn csv_to_json(
     target_file: &str,
