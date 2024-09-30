@@ -1,7 +1,5 @@
 use clap::{Arg, Command};
 use std::collections::HashSet;
-use std::env;
-use std::ffi::OsString;
 mod texas;
 mod utils;
 use texas::{
@@ -22,10 +20,6 @@ use texas::{
 };
 
 fn main() {
-    // カレントディレクトリを取得
-    let current_directory = env::current_dir().expect("Current Directoru Get Error.");
-    let current_dir_str: &'static str = current_directory.to_str();
-
     let matches = Command::new("texas")
         .version("1.0")
         .author("Itsuki Maru")
@@ -63,7 +57,7 @@ fn main() {
                         .help("Output directory.")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
-                        .default_value(&*current_dir_str),
+                        .default_value("./"),
                 ),
         )
         .subcommand(
@@ -231,7 +225,7 @@ fn main() {
                         .help("Output directory.")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
-                        .default_value(&*current_dir_str),
+                        .default_value("./"),
                 ),
         )
         .subcommand(
@@ -263,7 +257,7 @@ fn main() {
                         .help("Output directory.")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
-                        .default_value(&*current_dir_str),
+                        .default_value("./"),
                 ),
         )
         .subcommand(
@@ -286,7 +280,7 @@ fn main() {
                         .help("Output directory.")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
-                        .default_value(&*current_dir_str),
+                        .default_value("./"),
                 )
                 .arg(
                     Arg::new("regex")
@@ -327,7 +321,7 @@ fn main() {
                         .help("Output directory.")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
-                        .default_value(&*current_dir_str),
+                        .default_value("./"),
                 )
                 .arg(
                     Arg::new("csv")
@@ -368,7 +362,7 @@ fn main() {
                         .help("Output directory.")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
-                        .default_value(&*current_dir_str),
+                        .default_value("./"),
                 ),
         )
         .subcommand(
@@ -409,7 +403,7 @@ fn main() {
                         .help("Output directory.")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
-                        .default_value(&*current_dir_str),
+                        .default_value("./"),
                 ),
         )
         .subcommand(
@@ -675,8 +669,8 @@ fn main() {
             }
         }
 
-    // "grep" ex) texas grep -t ./testfile/test1.txt -r ^これは`
-    // "grep" ex) texas grep -t ./testfile/test2.csv -r ^1,` -c
+    // "grep" ex) texas grep -t ./testfile/test1.txt -r ^これは
+    // "grep" ex) texas grep -t ./testfile/test2.csv -r ^1, -c
     } else if let Some(matches) = matches.subcommand_matches("grep") {
         if let (Some(target_file), Some(regex_pattern), Some(output_dir), csv_header) = (
             matches.get_one::<String>("target"),
