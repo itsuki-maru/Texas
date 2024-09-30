@@ -1,6 +1,7 @@
-use clap::{App, Arg, Command};
+use clap::{Arg, Command};
 use std::collections::HashSet;
 use std::env;
+use std::ffi::OsString;
 mod texas;
 mod utils;
 use texas::{
@@ -23,9 +24,9 @@ use texas::{
 fn main() {
     // カレントディレクトリを取得
     let current_directory = env::current_dir().expect("Current Directoru Get Error.");
-    let current_dir_str = current_directory.to_str().unwrap_or("Invalied Path.");
+    let current_dir_str: &'static str = current_directory.to_str();
 
-    let matches = App::new("texas")
+    let matches = Command::new("texas")
         .version("1.0")
         .author("Itsuki Maru")
         .about("Text file proessing tool.")
@@ -43,7 +44,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("regex")
@@ -52,7 +53,7 @@ fn main() {
                         .value_name("REGEX")
                         .help("Reguler expression for splitting.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("output")
@@ -61,8 +62,8 @@ fn main() {
                         .value_name("OUTPUT")
                         .help("Output directory.")
                         .required(false)
-                        .takes_value(true)
-                        .default_value(current_dir_str),
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(&*current_dir_str),
                 ),
         )
         .subcommand(
@@ -75,7 +76,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("colname")
@@ -84,7 +85,7 @@ fn main() {
                         .value_name("COLUMN")
                         .help("CSV sorted by column.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("reverse")
@@ -93,7 +94,7 @@ fn main() {
                         .value_name("REVERSE")
                         .help("Reverse CSV sort.")
                         .required(false)
-                        .takes_value(false)
+                        .action(clap::ArgAction::SetTrue)
                 ),
         )
         .subcommand(
@@ -106,7 +107,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("colname")
@@ -115,7 +116,7 @@ fn main() {
                         .value_name("COLUMN")
                         .help("CSV groupby column.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 ),
         )
         .subcommand(
@@ -128,7 +129,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("keycol")
@@ -137,7 +138,7 @@ fn main() {
                         .value_name("COLUMN")
                         .help("Key column.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("columns")
@@ -146,8 +147,8 @@ fn main() {
                         .value_name("TARGET COLUMNS")
                         .help("Target columns.")
                         .required(true)
-                        .takes_value(true)
-                        .multiple(true)
+                        .value_parser(clap::value_parser!(String))
+                        .num_args(1..)
                 )
                 .arg(
                     Arg::new("floatmode")
@@ -156,7 +157,7 @@ fn main() {
                         .value_name("FLOAT MODE")
                         .help("Aggregate float.")
                         .required(false)
-                        .takes_value(false)
+                        .action(clap::ArgAction::SetTrue)
                 )
                 .arg(
                     Arg::new("iscsv")
@@ -165,7 +166,7 @@ fn main() {
                         .value_name("OUTPUT CSV")
                         .help("Std Output To CSV.")
                         .required(false)
-                        .takes_value(false)
+                        .action(clap::ArgAction::SetTrue)
                 ),
         )
         .subcommand(
@@ -178,7 +179,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("iscsv")
@@ -187,7 +188,7 @@ fn main() {
                         .value_name("CSV CODE")
                         .help("CSV header row print.")
                         .required(false)
-                        .takes_value(false)
+                        .action(clap::ArgAction::SetTrue)
                 )
                 .arg(
                     Arg::new("limit")
@@ -196,7 +197,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Read row limit.")
                         .required(false)
-                        .takes_value(true)
+                        .value_parser(clap::value_parser!(String))
                         .value_parser(clap::value_parser!(usize)),
                 ),
         )
@@ -210,7 +211,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("columns")
@@ -219,8 +220,8 @@ fn main() {
                         .value_name("TARGET COLUMNS")
                         .help("Target columns.")
                         .required(true)
-                        .takes_value(true)
-                        .multiple(true)
+                        .value_parser(clap::value_parser!(String))
+                        .num_args(1..)
                 )
                 .arg(
                     Arg::new("output")
@@ -229,8 +230,8 @@ fn main() {
                         .value_name("OUTPUT")
                         .help("Output directory.")
                         .required(false)
-                        .takes_value(true)
-                        .default_value(current_dir_str),
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(&*current_dir_str),
                 ),
         )
         .subcommand(
@@ -243,7 +244,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("regex")
@@ -252,7 +253,7 @@ fn main() {
                         .value_name("REGEX")
                         .help("Reguler expression for splitting.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("output")
@@ -261,8 +262,8 @@ fn main() {
                         .value_name("OUTPUT")
                         .help("Output directory.")
                         .required(false)
-                        .takes_value(true)
-                        .default_value(current_dir_str),
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(&*current_dir_str),
                 ),
         )
         .subcommand(
@@ -275,7 +276,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("output")
@@ -284,8 +285,8 @@ fn main() {
                         .value_name("OUTPUT")
                         .help("Output directory.")
                         .required(false)
-                        .takes_value(true)
-                        .default_value(current_dir_str),
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(&*current_dir_str),
                 )
                 .arg(
                     Arg::new("regex")
@@ -294,7 +295,7 @@ fn main() {
                         .value_name("REGEX")
                         .help("Reguler expression for splitting.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 ),
         )
         .subcommand(
@@ -307,7 +308,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("regex")
@@ -316,7 +317,7 @@ fn main() {
                         .value_name("REGEX")
                         .help("Reguler expression for splitting.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("output")
@@ -325,8 +326,8 @@ fn main() {
                         .value_name("OUTPUT")
                         .help("Output directory.")
                         .required(false)
-                        .takes_value(true)
-                        .default_value(current_dir_str),
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(&*current_dir_str),
                 )
                 .arg(
                     Arg::new("csv")
@@ -335,7 +336,7 @@ fn main() {
                         .value_name("CSV HEADER")
                         .help("CSV header row insert.")
                         .required(false)
-                        .takes_value(false)
+                        .action(clap::ArgAction::SetTrue)
                 ),
         )
         .subcommand(
@@ -348,7 +349,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("colname")
@@ -357,7 +358,7 @@ fn main() {
                         .value_name("COLUMN")
                         .help("CSV split by column.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("output")
@@ -366,8 +367,8 @@ fn main() {
                         .value_name("OUTPUT")
                         .help("Output directory.")
                         .required(false)
-                        .takes_value(true)
-                        .default_value(current_dir_str),
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(&*current_dir_str),
                 ),
         )
         .subcommand(
@@ -380,7 +381,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("regex")
@@ -389,7 +390,7 @@ fn main() {
                         .value_name("REGEX")
                         .help("Reguler expression for splitting.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("sed")
@@ -398,7 +399,7 @@ fn main() {
                         .value_name("SED")
                         .help("Replaced text.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("output")
@@ -407,8 +408,8 @@ fn main() {
                         .value_name("OUTPUT")
                         .help("Output directory.")
                         .required(false)
-                        .takes_value(true)
-                        .default_value(current_dir_str),
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(&*current_dir_str),
                 ),
         )
         .subcommand(
@@ -421,7 +422,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("colname")
@@ -430,7 +431,7 @@ fn main() {
                         .value_name("COLUMN")
                         .help("CSV sum by column.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 ),
         )
         .subcommand(
@@ -443,7 +444,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target CSV file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 ),
         )
         .subcommand(
@@ -456,7 +457,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target CSV file (csv, txt)")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 ),
         )
         .subcommand(
@@ -469,7 +470,7 @@ fn main() {
                         .value_name("FILE")
                         .help("Target text file.")
                         .required(true)
-                        .takes_value(true),
+                        .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("chars")
@@ -478,7 +479,7 @@ fn main() {
                         .value_name("CHARS COUNT")
                         .help("Text file chars count.")
                         .required(false)
-                        .takes_value(false)
+                        .action(clap::ArgAction::SetTrue)
                 )
                 .arg(
                     Arg::new("lines")
@@ -487,7 +488,7 @@ fn main() {
                         .value_name("LINE COUNT")
                         .help("Text file lines count.(Does not include line breaks)")
                         .required(false)
-                        .takes_value(false)
+                        .action(clap::ArgAction::SetTrue)
                 ),
         )
         .get_matches();
@@ -527,9 +528,9 @@ fn main() {
      // "split" ex) texas split -t ./testfile/test1.txt -r "^第[1-9]章"
     } else if let Some(matches) = matches.subcommand_matches("split") {
         if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
-            matches.value_of("target"),
-            matches.value_of("regex"),
-            matches.value_of("output"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("regex"),
+            matches.get_one::<String>("output"),
         ) {
             match split_file(target_file, regex_pattrern, output_dir) {
                 Ok(message) => println!("{}", message),
@@ -541,9 +542,9 @@ fn main() {
     // "sortcsv" ex) texas sortcsv -t ./testfile/test2.csv -c id -r
     } else if let Some(matches) = matches.subcommand_matches("sortcsv") {
         if let (Some(target_file), Some(column_name), is_reverse) = (
-            matches.value_of("target"),
-            matches.value_of("colname"),
-            matches.contains_id("reverse"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("colname"),
+            matches.get_flag("reverse"),
         ) {
             if is_reverse {
                 // 降順ソート
@@ -563,8 +564,8 @@ fn main() {
     // "groupby" ex) texas groupby -t ./testfile/test2.csv -c name
     } else if let Some(matches) = matches.subcommand_matches("groupby") {
         if let (Some(target_file), Some(column_name)) = (
-            matches.value_of("target"),
-            matches.value_of("colname"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("colname"),
         ) {
             match groupby_column_csv(target_file, column_name) {
                 Ok(_) => {return},
@@ -575,11 +576,11 @@ fn main() {
     // "aggregate" ex) texas aggregate -t ./testfile/test2.csv -k name -c score
     } else if let Some(matches) = matches.subcommand_matches("aggregate") {
         if let (Some(target_file), Some(key_column), Some(columns), floatmode, is_csv) = (
-            matches.value_of("target"),
-            matches.value_of("keycol"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("keycol"),
             matches.get_many::<String>("columns"),
-            matches.contains_id("floatmode"),
-            matches.contains_id("iscsv"),
+            matches.get_flag("floatmode"),
+            matches.get_flag("iscsv"),
          ) {
             let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
             if floatmode {
@@ -613,8 +614,8 @@ fn main() {
     // "head" ex) texas head -t ./testfile/test2.csv -c
     } else if let Some(matches) = matches.subcommand_matches("head") {
         if let (Some(target_file), iscsv) = (
-            matches.value_of("target"),
-            matches.contains_id("iscsv"),
+            matches.get_one::<String>("target"),
+            matches.get_flag("iscsv"),
         ) {
             if iscsv {
                 match print_header_csv(target_file) {
@@ -636,9 +637,9 @@ fn main() {
     // "excol" ex) texas excol -t ./testfile/test2.csv -c name score
     } else if let Some(matches) = matches.subcommand_matches("excol") {
         if let (Some(target_file), Some(columns), Some(output_dir)) = (
-            matches.value_of("target"),
+            matches.get_one::<String>("target"),
             matches.get_many::<String>("columns"),
-            matches.value_of("output"),
+            matches.get_one::<String>("output"),
          ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
             match extract_column(target_file, columns_str, output_dir) {
@@ -650,9 +651,9 @@ fn main() {
     // "clean" ex) texas clean -t ./testfile/test2.csv -r "^[2-3],"
     } else if let Some(matches) = matches.subcommand_matches("clean") {
         if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
-            matches.value_of("target"),
-            matches.value_of("regex"),
-            matches.value_of("output"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("regex"),
+            matches.get_one::<String>("output"),
         ) {
             match clean_row(target_file, regex_pattrern, output_dir) {
                 Ok(message) => println!("{}", message),
@@ -664,9 +665,9 @@ fn main() {
     // "collect" ex) texas collect -t ./test -r "^maru" ./collect
     } else if let Some(matches) = matches.subcommand_matches("collect") {
         if let (Some(target_dir), Some(output_dir), Some(regex_pattern)) = (
-            matches.value_of("target"),
-            matches.value_of("output"),
-            matches.value_of("regex"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("output"),
+            matches.get_one::<String>("regex"),
         ) {
             match collect_file(target_dir, output_dir, regex_pattern) {
                 Ok(message) => println!("{}", message),
@@ -678,10 +679,10 @@ fn main() {
     // "grep" ex) texas grep -t ./testfile/test2.csv -r ^1,` -c
     } else if let Some(matches) = matches.subcommand_matches("grep") {
         if let (Some(target_file), Some(regex_pattern), Some(output_dir), csv_header) = (
-            matches.value_of("target"),
-            matches.value_of("regex"),
-            matches.value_of("output"),
-            matches.contains_id("csv"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("regex"),
+            matches.get_one::<String>("output"),
+            matches.get_flag("csv"),
         ) {
             if csv_header {
                 match grep_row(target_file, regex_pattern, output_dir, true) {
@@ -699,9 +700,9 @@ fn main() {
     // "blocksplit" ex) texas blocksplit -t ./testfile/test3-blocksplit.txt -c id
     } else if let Some(matches) = matches.subcommand_matches("blocksplit") {
         if let (Some(target_file), Some(target_column), Some(output_directory)) = (
-            matches.value_of("target"),
-            matches.value_of("colname"),
-            matches.value_of("output"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("colname"),
+            matches.get_one::<String>("output"),
         ) {
             match block_split(target_file, target_column, output_directory) {
                 Ok(message) => println!("{}", message),
@@ -712,10 +713,10 @@ fn main() {
     // "red" ex) texas red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
     } else if let Some(matches) = matches.subcommand_matches("red") {
         if let (Some(target_file), Some(regex_pattern), Some(replaced_text), Some(output_directory)) = (
-            matches.value_of("target"),
-            matches.value_of("regex"),
-            matches.value_of("sed"),
-            matches.value_of("output"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("regex"),
+            matches.get_one::<String>("sed"),
+            matches.get_one::<String>("output"),
         ) {
             match red(target_file, regex_pattern, replaced_text, output_directory) {
                 Ok(message) => println!("{}", message),
@@ -726,8 +727,8 @@ fn main() {
     // "sum" texas sum -t ./testfile/test2.csv -c score
     } else if let Some(matches) = matches.subcommand_matches("sum") {
         if let (Some(target_file), Some(column_name)) = (
-            matches.value_of("target"),
-            matches.value_of("colname"),
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("colname"),
         ) {
             match sum(target_file, column_name) {
                 Ok(_) => {return},
@@ -737,7 +738,7 @@ fn main() {
     
     // "ctoj" ex) texas ctoj -t ./testfile/test5-ctoj.csv
     } else if let Some(matches) = matches.subcommand_matches("ctoj") {
-        if let Some(target_file) = matches.value_of("target") {
+        if let Some(target_file) = matches.get_one::<String>("target") {
             match csv_to_json(target_file) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
@@ -746,7 +747,7 @@ fn main() {
     
     // "lastrow" ex) texas lastrow -t ./testfile/test1.txt
     } else if let Some(matches) = matches.subcommand_matches("lastrow") {
-        if let Some(target_file) = matches.value_of("target") {
+        if let Some(target_file) = matches.get_one::<String>("target") {
             match get_last_row(target_file) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
@@ -757,9 +758,9 @@ fn main() {
     // "wc" ex) texas lastrow -t ./testfile/test1.txt -m
     } else if let Some(matches) = matches.subcommand_matches("wc") {
         if let (Some(target_file), chars, lines) = (
-            matches.value_of("target"),
-            matches.contains_id("chars"),
-            matches.contains_id("lines"),
+            matches.get_one::<String>("target"),
+            matches.get_flag("chars"),
+            matches.get_flag("lines"),
         
         ) {
             if chars {
