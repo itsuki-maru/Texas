@@ -7,7 +7,8 @@ use super::super::utils::{get_abs_filepath, is_file};
 #[derive(Debug, Serialize)]
 struct Entry {
     records: Vec<HashMap<String, String>>,
-    counts: HashMap<String, HashMap<String, usize>>, // カラム名 -> 値 -> 件数
+    counts: HashMap<String, HashMap<String, usize>>,
+    sum: HashMap<String, f64>,
 }
 
 // CSVファイルを集計
@@ -15,7 +16,8 @@ pub fn csv_tree(
     target_file: &str,
     category_column: &str,
     key_column: &str,
-    target_columns: Vec<&str>,
+    count_columns: Vec<&str>,
+    sum_columns: Vec<&str>,
 ) -> Result<()> {
     // 対象ファイルの絶対パスを取得
     let target_file_abs = match get_abs_filepath(target_file) {
@@ -56,16 +58,26 @@ pub fn csv_tree(
         let entry = name_map.entry(name).or_insert_with(|| Entry {
             records: vec![],
             counts: HashMap::new(),
+            sum: HashMap::new(),
         });
 
         // 元の行を記録
         entry.records.push(row.clone());
 
-        // 集計処理
-        for col in &target_columns {
+        // counts（文字列出現回数）
+        for col in &count_columns {
             let value = row.get(*col).cloned().unwrap_or_default();
             let col_map = entry.counts.entry(col.to_string()).or_default();
             *col_map.entry(value).or_insert(0) += 1;
+        }
+
+        // sum（数値合計）
+        for col in &sum_columns {
+            if let Some(val) = row.get(*col) {
+                if let Ok(num) = val.parse::<f64>() {
+                    *entry.sum.entry(col.to_string()).or_insert(0.0) += num;
+                }
+            }
         }
 
     }

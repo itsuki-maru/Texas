@@ -526,6 +526,16 @@ fn main() {
                         .value_parser(clap::value_parser!(String))
                         .num_args(1..)
                 )
+                .arg(
+                    Arg::new("sum")
+                        .short('S')
+                        .long("SUM")
+                        .value_name("SUM TARGET COLUMNS")
+                        .help("ex) -S size")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String))
+                        .num_args(1..)
+                )
         )
         .get_matches();
 
@@ -813,14 +823,16 @@ fn main() {
         }
     // "csvtree" ex) texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size
     } else if let Some(matches) = matches.subcommand_matches("csvtree") {
-        if let (Some(target_file), Some(key_column), Some(name_column), Some(columns)) = (
+        if let (Some(target_file), Some(key_column), Some(name_column), Some(count_columns), Some(sum_columns)) = (
             matches.get_one::<String>("target"),
             matches.get_one::<String>("category"),
             matches.get_one::<String>("key"),
             matches.get_many::<String>("count"),
+            matches.get_many::<String>("sum"),
         ) {
-            let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
-            match csv_tree(target_file, key_column, name_column,columns_str) {
+            let count_columns_str: Vec<&str> = count_columns.map(|c| c.as_str()).collect();
+            let sum_columns_str: Vec<&str> = sum_columns.map(|c| c.as_str()).collect();
+            match csv_tree(target_file, key_column, name_column,count_columns_str, sum_columns_str) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
             }
