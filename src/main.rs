@@ -22,7 +22,7 @@ use texas::{
 
 fn main() {
     let matches = Command::new("texas")
-        .version("1.0")
+        .version("1.1.0")
         .author("Itsuki Maru")
         .about("Text file proessing tool.")
         .subcommand(

@@ -29,7 +29,7 @@ CSVファイルの列内データの出現回数をカウントする。
 texas groupby -t ./testfile/test2.csv -c name
 ```
 
-## agrregate
+## aggregate
 
 CSVファイルのキー列と集計対象列（複数指定可能）を指定して合計とデータの個数を集計し、標準出力する。`-c`オプションでカンマ区切りで出力。
 
@@ -140,4 +140,12 @@ texas lastrow -t ./testfile/test1.txt
 texas wc -t ./testfile/test1.txt -l
 # 文字数をカウント（改行コードなどは含まない）
 texas wc -t ./testfile/test1.txt -m
+```
+
+## csvtree
+
+CSVファイルをネストしたツリー構造に変換し、出現回数をカウントアップして出力するコマンド
+
+```shell
+texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size
 ```
