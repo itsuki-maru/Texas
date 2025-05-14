@@ -1,8 +1,14 @@
 use csv::ReaderBuilder;
 use std::collections::HashMap;
+use serde::Serialize;
 use anyhow::{Result, anyhow};
 use super::super::utils::{get_abs_filepath, is_file};
 
+#[derive(Debug, Serialize)]
+struct Entry {
+    records: Vec<HashMap<String, String>>,
+    counts: HashMap<String, HashMap<String, usize>>, // カラム名 -> 値 -> 件数
+}
 
 // CSVファイルを集計
 pub fn csv_counter(
@@ -32,7 +38,7 @@ pub fn csv_counter(
         .from_path(target_file_abs)?;
 
     let headers = rdr.headers()?.clone();
-    let mut data_dict: HashMap<String, HashMap<String, HashMap<String, HashMap<String, usize>>>> = HashMap::new();
+    let mut data_dict: HashMap<String, HashMap<String, Entry>> = HashMap::new();
 
     for result in rdr.records() {
         let record = result?;
@@ -45,13 +51,21 @@ pub fn csv_counter(
         let category = row.get(key_column).cloned().unwrap_or_default();
         let name = row.get(name_column).cloned().unwrap_or_default();
 
+        // Entryの取得と初期化
         let name_map = data_dict.entry(category).or_default();
-        let start_map = name_map.entry(name).or_default();
+        let entry = name_map.entry(name).or_insert_with(|| Entry {
+            records: vec![],
+            counts: HashMap::new(),
+        });
 
+        // 元の行を記録
+        entry.records.push(row.clone());
+
+        // 集計処理
         for col in &target_columns {
             let value = row.get(*col).cloned().unwrap_or_default();
-            let counter = start_map.entry(col.to_string()).or_default();
-            *counter.entry(value).or_insert(0) += 1;
+            let col_map = entry.counts.entry(col.to_string()).or_default();
+            *col_map.entry(value).or_insert(0) += 1;
         }
 
     }
