@@ -13,3 +13,4 @@ pub mod sum;
 pub mod csvtojson;
 pub mod lastrow;
 pub mod wc;
+pub mod csv_counter;

@@ -17,6 +17,7 @@ use texas::{
     csvtojson::csv_to_json,
     lastrow::get_last_row,
     wc::{line_count, word_count},
+    csv_counter::csv_counter,
 };
 
 fn main() {
@@ -485,6 +486,47 @@ fn main() {
                         .action(clap::ArgAction::SetTrue)
                 ),
         )
+        .subcommand(
+            Command::new("jcount")
+                .about("Word count.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("Target text file.")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String)),
+                )
+                .arg(
+                    Arg::new("keycol")
+                        .short('k')
+                        .long("keycolumn")
+                        .value_name("COLUMN")
+                        .help("Key column.")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String)),
+                )
+                .arg(
+                    Arg::new("namecol")
+                        .short('n')
+                        .long("namecolumn")
+                        .value_name("NAME COLUMN")
+                        .help("Name column.")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String)),
+                )
+                .arg(
+                    Arg::new("columns")
+                        .short('c')
+                        .long("columns")
+                        .value_name("TARGET COLUMNS")
+                        .help("Target columns.")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String))
+                        .num_args(1..)
+                )
+        )
         .get_matches();
 
     // Welcome Command
@@ -575,7 +617,7 @@ fn main() {
             matches.get_many::<String>("columns"),
             matches.get_flag("floatmode"),
             matches.get_flag("iscsv"),
-         ) {
+        ) {
             let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
             if floatmode {
                 if is_csv {
@@ -767,6 +809,20 @@ fn main() {
                     Ok(_) => {return},
                     Err(e) => println!("{}", e)
                 }
+            }
+        }
+    // "jount" ex) texas jount -t ./testfile/test2.csv -k name -c score
+    } else if let Some(matches) = matches.subcommand_matches("jcount") {
+        if let (Some(target_file), Some(key_column), Some(name_column), Some(columns)) = (
+            matches.get_one::<String>("target"),
+            matches.get_one::<String>("keycol"),
+            matches.get_one::<String>("namecol"),
+            matches.get_many::<String>("columns"),
+        ) {
+            let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
+            match csv_counter(target_file, key_column, name_column,columns_str) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e)
             }
         }
     }
