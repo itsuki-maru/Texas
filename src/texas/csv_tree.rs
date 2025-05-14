@@ -11,10 +11,10 @@ struct Entry {
 }
 
 // CSVファイルを集計
-pub fn csv_counter(
+pub fn csv_tree(
     target_file: &str,
+    category_column: &str,
     key_column: &str,
-    name_column: &str,
     target_columns: Vec<&str>,
 ) -> Result<()> {
     // 対象ファイルの絶対パスを取得
@@ -33,14 +33,14 @@ pub fn csv_counter(
         return Err(anyhow!(format!("{} is not text file.", target_file)))
     }
 
-    let mut rdr = ReaderBuilder::new()
+    let mut reader = ReaderBuilder::new()
         .delimiter(b',')
         .from_path(target_file_abs)?;
 
-    let headers = rdr.headers()?.clone();
+    let headers = reader.headers()?.clone();
     let mut data_dict: HashMap<String, HashMap<String, Entry>> = HashMap::new();
 
-    for result in rdr.records() {
+    for result in reader.records() {
         let record = result?;
         let row: HashMap<String, String> = headers
             .iter()
@@ -48,8 +48,8 @@ pub fn csv_counter(
             .map(|(k, v)| (k.to_string(), v.to_string()))
             .collect();
 
-        let category = row.get(key_column).cloned().unwrap_or_default();
-        let name = row.get(name_column).cloned().unwrap_or_default();
+        let category = row.get(category_column).cloned().unwrap_or_default();
+        let name = row.get(key_column).cloned().unwrap_or_default();
 
         // Entryの取得と初期化
         let name_map = data_dict.entry(category).or_default();

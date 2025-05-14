@@ -17,7 +17,7 @@ use texas::{
     csvtojson::csv_to_json,
     lastrow::get_last_row,
     wc::{line_count, word_count},
-    csv_counter::csv_counter,
+    csv_tree::csv_tree,
 };
 
 fn main() {
@@ -487,41 +487,41 @@ fn main() {
                 ),
         )
         .subcommand(
-            Command::new("jcount")
-                .about("Word count.")
+            Command::new("csvtree")
+                .about("CSV to tree mapping.")
                 .arg(
                     Arg::new("target")
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file.")
+                        .help("Target csv file.")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
-                    Arg::new("keycol")
-                        .short('k')
-                        .long("keycolumn")
+                    Arg::new("category")
+                        .short('c')
+                        .long("category")
                         .value_name("COLUMN")
                         .help("Key column.")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
-                    Arg::new("namecol")
-                        .short('n')
-                        .long("namecolumn")
-                        .value_name("NAME COLUMN")
-                        .help("Name column.")
+                    Arg::new("key")
+                        .short('k')
+                        .long("key")
+                        .value_name("KEY COLUMN")
+                        .help("Key column.")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
-                    Arg::new("columns")
-                        .short('c')
-                        .long("columns")
-                        .value_name("TARGET COLUMNS")
-                        .help("Target columns.")
+                    Arg::new("count")
+                        .short('C')
+                        .long("count")
+                        .value_name("COUNT TARGET COLUMNS")
+                        .help("Count target columns.")
                         .required(true)
                         .value_parser(clap::value_parser!(String))
                         .num_args(1..)
@@ -676,7 +676,7 @@ fn main() {
             matches.get_one::<String>("target"),
             matches.get_many::<String>("columns"),
             matches.get_one::<String>("output"),
-         ) {
+        ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
             match extract_column(target_file, columns_str, output_dir) {
                 Ok(message) => println!("{}", message),
@@ -811,16 +811,16 @@ fn main() {
                 }
             }
         }
-    // "jount" ex) texas jount -t ./testfile/test2.csv -k name -c score
-    } else if let Some(matches) = matches.subcommand_matches("jcount") {
+    // "csvtree" ex) texas csvtree -t .\testfile\test6.csv -c category -k name -C origin grade size
+    } else if let Some(matches) = matches.subcommand_matches("csvtree") {
         if let (Some(target_file), Some(key_column), Some(name_column), Some(columns)) = (
             matches.get_one::<String>("target"),
-            matches.get_one::<String>("keycol"),
-            matches.get_one::<String>("namecol"),
-            matches.get_many::<String>("columns"),
+            matches.get_one::<String>("category"),
+            matches.get_one::<String>("key"),
+            matches.get_many::<String>("count"),
         ) {
             let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
-            match csv_counter(target_file, key_column, name_column,columns_str) {
+            match csv_tree(target_file, key_column, name_column,columns_str) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
             }
