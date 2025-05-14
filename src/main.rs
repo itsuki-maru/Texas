@@ -529,7 +529,7 @@ fn main() {
                 .arg(
                     Arg::new("sum")
                         .short('S')
-                        .long("SUM")
+                        .long("sum")
                         .value_name("SUM TARGET COLUMNS")
                         .help("ex) -S size")
                         .required(true)
