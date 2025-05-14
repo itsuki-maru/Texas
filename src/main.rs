@@ -37,7 +37,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test1.txt")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -46,7 +46,7 @@ fn main() {
                         .short('r')
                         .long("regex")
                         .value_name("REGEX")
-                        .help("Reguler expression for splitting.")
+                        .help("ex) -r ^第[1-9]章")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -55,7 +55,7 @@ fn main() {
                         .short('o')
                         .long("output")
                         .value_name("OUTPUT")
-                        .help("Output directory.")
+                        .help("ex) -o ~/Desktop")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .default_value("./"),
@@ -69,7 +69,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test2.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -78,7 +78,7 @@ fn main() {
                         .short('c')
                         .long("column")
                         .value_name("COLUMN")
-                        .help("CSV sorted by column.")
+                        .help("ex) -c id")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -87,7 +87,7 @@ fn main() {
                         .short('r')
                         .long("reverse")
                         .value_name("REVERSE")
-                        .help("Reverse CSV sort.")
+                        .help("ex) -r")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 ),
@@ -100,7 +100,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test2.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -109,7 +109,7 @@ fn main() {
                         .short('c')
                         .long("column")
                         .value_name("COLUMN")
-                        .help("CSV groupby column.")
+                        .help("ex) -c name")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 ),
@@ -122,7 +122,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test2.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -131,7 +131,7 @@ fn main() {
                         .short('k')
                         .long("keycolumn")
                         .value_name("COLUMN")
-                        .help("Key column.")
+                        .help("ex) -k name")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -140,7 +140,7 @@ fn main() {
                         .short('c')
                         .long("columns")
                         .value_name("TARGET COLUMNS")
-                        .help("Target columns.")
+                        .help("ex) -c score")
                         .required(true)
                         .value_parser(clap::value_parser!(String))
                         .num_args(1..)
@@ -150,7 +150,7 @@ fn main() {
                         .short('f')
                         .long("floatmode")
                         .value_name("FLOAT MODE")
-                        .help("Aggregate float.")
+                        .help("ex) -f")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 )
@@ -159,7 +159,7 @@ fn main() {
                         .short('i')
                         .long("iscsv")
                         .value_name("OUTPUT CSV")
-                        .help("Std Output To CSV.")
+                        .help("ex) -i")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 ),
@@ -172,7 +172,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test2.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -181,7 +181,7 @@ fn main() {
                         .short('c')
                         .long("iscsv")
                         .value_name("CSV CODE")
-                        .help("CSV header row print.")
+                        .help("ex) -c")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 )
@@ -190,7 +190,7 @@ fn main() {
                         .short('l')
                         .long("limit")
                         .value_name("FILE")
-                        .help("Read row limit.")
+                        .help("ex) -l 10")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .value_parser(clap::value_parser!(usize)),
@@ -204,7 +204,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv)")
+                        .help("ex) -t ./testfile/test2.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -213,7 +213,7 @@ fn main() {
                         .short('c')
                         .long("columns")
                         .value_name("TARGET COLUMNS")
-                        .help("Target columns.")
+                        .help("ex) -c name score")
                         .required(true)
                         .value_parser(clap::value_parser!(String))
                         .num_args(1..)
@@ -223,7 +223,7 @@ fn main() {
                         .short('o')
                         .long("output")
                         .value_name("OUTPUT")
-                        .help("Output directory.")
+                        .help("ex) ~/Desktop")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .default_value("./"),
@@ -237,7 +237,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test2.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -246,7 +246,7 @@ fn main() {
                         .short('r')
                         .long("regex")
                         .value_name("REGEX")
-                        .help("Reguler expression for splitting.")
+                        .help("ex) -r ^[2-3],")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -255,7 +255,7 @@ fn main() {
                         .short('o')
                         .long("output")
                         .value_name("OUTPUT")
-                        .help("Output directory.")
+                        .help("ex) ~/Desktop")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .default_value("./"),
@@ -268,8 +268,8 @@ fn main() {
                     Arg::new("target")
                         .short('t')
                         .long("target")
-                        .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .value_name("Directory")
+                        .help("ex) -t ./testfile/collect_test")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -278,7 +278,7 @@ fn main() {
                         .short('o')
                         .long("output")
                         .value_name("OUTPUT")
-                        .help("Output directory.")
+                        .help("ex) -o ~/Desktop")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .default_value("./"),
@@ -288,7 +288,7 @@ fn main() {
                         .short('r')
                         .long("regex")
                         .value_name("REGEX")
-                        .help("Reguler expression for splitting.")
+                        .help("ex) -r ^maru")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 ),
@@ -301,7 +301,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test1.txt")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -310,7 +310,7 @@ fn main() {
                         .short('r')
                         .long("regex")
                         .value_name("REGEX")
-                        .help("Reguler expression for splitting.")
+                        .help("ex) -r ^これは")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -319,7 +319,7 @@ fn main() {
                         .short('o')
                         .long("output")
                         .value_name("OUTPUT")
-                        .help("Output directory.")
+                        .help("ex) -o ~/Desktop")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .default_value("./"),
@@ -329,7 +329,7 @@ fn main() {
                         .short('c')
                         .long("csv")
                         .value_name("CSV HEADER")
-                        .help("CSV header row insert.")
+                        .help("ex) -c")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 ),
@@ -342,7 +342,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test3-blocksplit.txt")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -351,7 +351,7 @@ fn main() {
                         .short('c')
                         .long("column")
                         .value_name("COLUMN")
-                        .help("CSV split by column.")
+                        .help("ex) -c id")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -360,7 +360,7 @@ fn main() {
                         .short('o')
                         .long("output")
                         .value_name("OUTPUT")
-                        .help("Output directory.")
+                        .help("ex) -o ~/Desktop")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .default_value("./"),
@@ -374,7 +374,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test4-red.txt")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -383,7 +383,7 @@ fn main() {
                         .short('r')
                         .long("regex")
                         .value_name("REGEX")
-                        .help("Reguler expression for splitting.")
+                        .help("ex) -r Rust")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -392,7 +392,7 @@ fn main() {
                         .short('s')
                         .long("sed")
                         .value_name("SED")
-                        .help("Replaced text.")
+                        .help("ex) -s Rust言語")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -401,7 +401,7 @@ fn main() {
                         .short('o')
                         .long("output")
                         .value_name("OUTPUT")
-                        .help("Output directory.")
+                        .help("ex) -o ~/Desktop")
                         .required(false)
                         .value_parser(clap::value_parser!(String))
                         .default_value("./"),
@@ -415,7 +415,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file (csv, txt)")
+                        .help("ex) -t ./testfile/test2.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -424,7 +424,7 @@ fn main() {
                         .short('c')
                         .long("column")
                         .value_name("COLUMN")
-                        .help("CSV sum by column.")
+                        .help("ex) -c score")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 ),
@@ -437,7 +437,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target CSV file (csv, txt)")
+                        .help("ex) -t ./testfile/test5-ctoj.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 ),
@@ -450,7 +450,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target CSV file (csv, txt)")
+                        .help("ex) -t ./testfile/test1.txt")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 ),
@@ -463,7 +463,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target text file.")
+                        .help("ex) -t ./testfile/test1.txt")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -472,7 +472,7 @@ fn main() {
                         .short('m')
                         .long("chars")
                         .value_name("CHARS COUNT")
-                        .help("Text file chars count.")
+                        .help("ex) -m")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 )
@@ -481,7 +481,7 @@ fn main() {
                         .short('l')
                         .long("lines")
                         .value_name("LINE COUNT")
-                        .help("Text file lines count.(Does not include line breaks)")
+                        .help("ex) -l")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 ),
@@ -494,7 +494,7 @@ fn main() {
                         .short('t')
                         .long("target")
                         .value_name("FILE")
-                        .help("Target csv file.")
+                        .help("ex) -t ./testfile/test6.csv")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -503,7 +503,7 @@ fn main() {
                         .short('c')
                         .long("category")
                         .value_name("COLUMN")
-                        .help("Key column.")
+                        .help("ex) -c category")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -512,7 +512,7 @@ fn main() {
                         .short('k')
                         .long("key")
                         .value_name("KEY COLUMN")
-                        .help("Key column.")
+                        .help("ex) -k name")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
                 )
@@ -521,7 +521,7 @@ fn main() {
                         .short('C')
                         .long("count")
                         .value_name("COUNT TARGET COLUMNS")
-                        .help("Count target columns.")
+                        .help("ex) -C origin grade size")
                         .required(true)
                         .value_parser(clap::value_parser!(String))
                         .num_args(1..)
@@ -697,8 +697,8 @@ fn main() {
             }
         }
 
-    // "collect" ex) texas collect -t ./test -r "maru"
-    // "collect" ex) texas collect -t ./test -r "^maru" ./collect
+    // "collect" ex) texas collect -t ./testfile/collect_test -r "maru"
+    // "collect" ex) texas collect -t ./testfile/collect_test -r "^maru" -o ~/Desktop
     } else if let Some(matches) = matches.subcommand_matches("collect") {
         if let (Some(target_dir), Some(output_dir), Some(regex_pattern)) = (
             matches.get_one::<String>("target"),
@@ -811,7 +811,7 @@ fn main() {
                 }
             }
         }
-    // "csvtree" ex) texas csvtree -t .\testfile\test6.csv -c category -k name -C origin grade size
+    // "csvtree" ex) texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size
     } else if let Some(matches) = matches.subcommand_matches("csvtree") {
         if let (Some(target_file), Some(key_column), Some(name_column), Some(columns)) = (
             matches.get_one::<String>("target"),

@@ -54,7 +54,7 @@ pub fn red(
     let result_content = re.replace_all(&text_content, replaced_text);
 
     // 出力
-    let output_path = output_directory_abs.join("red_output.txx");
+    let output_path = output_directory_abs.join("red_output.txt");
     fs::write(output_path, result_content.as_ref()).map_err(|e| anyhow!("Write error.: {}", e))?;
 
     Ok("Complated".to_string())
