@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 1.1.1
+
+- `csvtree` サブコマンドの出力結果に累積加算の項目を追加
+- `csvtree` サブコマンドのlong引数を修正
+
 ## Version 1.1.0
 
 ### サブコマンドの追加

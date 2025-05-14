@@ -22,7 +22,7 @@ use texas::{
 
 fn main() {
     let matches = Command::new("texas")
-        .version("1.1.0")
+        .version("1.1.1")
         .author("Itsuki Maru")
         .about("Text file proessing tool.")
         .subcommand(
@@ -821,7 +821,7 @@ fn main() {
                 }
             }
         }
-    // "csvtree" ex) texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size
+    // "csvtree" ex) texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size -S size
     } else if let Some(matches) = matches.subcommand_matches("csvtree") {
         if let (Some(target_file), Some(key_column), Some(name_column), Some(count_columns), Some(sum_columns)) = (
             matches.get_one::<String>("target"),

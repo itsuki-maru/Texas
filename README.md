@@ -144,8 +144,8 @@ texas wc -t ./testfile/test1.txt -m
 
 ## csvtree
 
-CSVファイルをネストしたツリー構造に変換し、出現回数をカウントアップして出力するコマンド
+CSVファイルをネストした2グループにカテゴライズされるデータを、JSONツリーの構造に変換し、出現回数をカウントアップと計算可能な値を累積加算してJSONとして出力するコマンド。
 
 ```shell
-texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size
+texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size -S size
 ```
