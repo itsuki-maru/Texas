@@ -47,7 +47,7 @@ pub fn sum_column(
     let mut new_headers = headers.clone();
     new_headers.push_field(new_column_name);
 
-    // CSVファイル出力用のWriterを作成
+    // 標準出力用のWriterを作成
     let mut writer = WriterBuilder::new().from_writer(io::stdout());
     writer.write_record(&new_headers)?;
 

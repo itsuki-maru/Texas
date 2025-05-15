@@ -242,16 +242,6 @@ fn main() {
                         .help("ex) -r ^[2-3],")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
-                )
-                .arg(
-                    Arg::new("output")
-                        .short('o')
-                        .long("output")
-                        .value_name("OUTPUT")
-                        .help("ex) ~/Desktop")
-                        .required(false)
-                        .value_parser(clap::value_parser!(String))
-                        .default_value("./"),
                 ),
         )
         .subcommand(
@@ -306,16 +296,6 @@ fn main() {
                         .help("ex) -r ^これは")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
-                )
-                .arg(
-                    Arg::new("output")
-                        .short('o')
-                        .long("output")
-                        .value_name("OUTPUT")
-                        .help("ex) -o ~/Desktop")
-                        .required(false)
-                        .value_parser(clap::value_parser!(String))
-                        .default_value("./"),
                 )
                 .arg(
                     Arg::new("csv")
@@ -722,20 +702,19 @@ fn main() {
         ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
             match extract_column(target_file, columns_str) {
-                Ok(message) => println!("{}", message),
+                Ok(_) => {},
                 Err(e) => println!("{}", e),
             }
         }
     
-    // "clean" ex) texas clean -t ./testfile/test2.csv -r "^[2-3],"
+    // "clean" ex) texas clean -t ./testfile/test2.csv -r ^[2-3],
     } else if let Some(matches) = matches.subcommand_matches("clean") {
-        if let (Some(target_file), Some(regex_pattrern), Some(output_dir)) = (
+        if let (Some(target_file), Some(regex_pattrern)) = (
             matches.get_one::<String>("target"),
             matches.get_one::<String>("regex"),
-            matches.get_one::<String>("output"),
         ) {
-            match clean_row(target_file, regex_pattrern, output_dir) {
-                Ok(message) => println!("{}", message),
+            match clean_row(target_file, regex_pattrern) {
+                Ok(_) => {},
                 Err(e) => println!("{}", e),
             }
         }
@@ -757,20 +736,19 @@ fn main() {
     // "grep" ex) texas grep -t ./testfile/test1.txt -r ^これは
     // "grep" ex) texas grep -t ./testfile/test2.csv -r ^1, -c
     } else if let Some(matches) = matches.subcommand_matches("grep") {
-        if let (Some(target_file), Some(regex_pattern), Some(output_dir), csv_header) = (
+        if let (Some(target_file), Some(regex_pattern), csv_header) = (
             matches.get_one::<String>("target"),
             matches.get_one::<String>("regex"),
-            matches.get_one::<String>("output"),
             matches.get_flag("csv"),
         ) {
             if csv_header {
-                match grep_row(target_file, regex_pattern, output_dir, true) {
-                    Ok(message) => println!("{}", message),
+                match grep_row(target_file, regex_pattern, true) {
+                    Ok(_) => {},
                     Err(e) => println!("{}", e)
                 }
             } else {
-                match grep_row(target_file, regex_pattern, output_dir, false) {
-                    Ok(message) => println!("{}", message),
+                match grep_row(target_file, regex_pattern, false) {
+                    Ok(_) => {},
                     Err(e) => println!("{}", e)
                 }
             }
@@ -791,14 +769,13 @@ fn main() {
 
     // "red" ex) texas red -t ./testfile/test4-red.txt -r "Rust" -s "Rust言語"
     } else if let Some(matches) = matches.subcommand_matches("red") {
-        if let (Some(target_file), Some(regex_pattern), Some(replaced_text), Some(output_directory)) = (
+        if let (Some(target_file), Some(regex_pattern), Some(replaced_text)) = (
             matches.get_one::<String>("target"),
             matches.get_one::<String>("regex"),
             matches.get_one::<String>("sed"),
-            matches.get_one::<String>("output"),
         ) {
-            match red(target_file, regex_pattern, replaced_text, output_directory) {
-                Ok(message) => println!("{}", message),
+            match red(target_file, regex_pattern, replaced_text) {
+                Ok(_) => {},
                 Err(e) => println!("{}", e)
             }
         }
