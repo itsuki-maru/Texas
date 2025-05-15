@@ -25,7 +25,7 @@ use scheme::SumMode;
 
 fn main() {
     let matches = Command::new("texas")
-        .version("1.1.1")
+        .version("1.2.0")
         .author("Itsuki Maru")
         .about("Text file proessing tool.")
         .subcommand(
@@ -842,7 +842,7 @@ fn main() {
                 Err(e) => println!("{}", e)
             }
         }
-    // "sumcol" ex) texas sumcol -t ./testfile/test2.csv -c name score
+    // "sumcol" ex) texas sumcol -t ./testfile/test2.csv -c score use -s score+use 
     } else if let Some(matches) = matches.subcommand_matches("sumcol") {
         if let (Some(target_file), Some(columns), Some(new_column_name), Some(mode)) = (
             matches.get_one::<String>("target"),

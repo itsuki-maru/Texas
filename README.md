@@ -149,3 +149,11 @@ CSVファイルをネストした2グループにカテゴライズされるデ�
 ```shell
 texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size -S size
 ```
+
+## sumcol
+
+指定列を加算して、新しい列を作成する`sumcol` サブコマンド。指定列が文字列であった場合は加算ではなく、文字列を結合したものが値となる。
+
+```bash
+texas sumcol -t ./testfile/test2.csv -c score use -s score+use 
+```
