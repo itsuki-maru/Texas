@@ -1,18 +1,14 @@
 use csv::{ReaderBuilder, WriterBuilder};
 use std::collections::HashSet;
 use std::fs::File;
+use std::io;
 use anyhow::{Result, anyhow};
-use super::super::utils::{
-    get_abs_filepath,
-    get_abs_directory_path,
-    is_dir,
-};
+use super::super::utils::get_abs_filepath;
 
 // CSVファイルの指定した列名のみを抽出してファイルに保存
 pub fn extract_column(
     target_file: &str,
     col_names: HashSet<&str>,
-    output_directory: &str,
 ) -> Result<String> {
 
     // 対象ファイルの絶対パスを取得
@@ -24,17 +20,6 @@ pub fn extract_column(
     // ファイルの存在確認
     if !target_file_abs.exists() {
         return Err(anyhow!(format!("{} is not exists.", target_file)))
-    }
-
-    // 出力先の絶対パスを取得
-    let output_directory_abs = match get_abs_directory_path(output_directory) {
-        Ok(path) => path,
-        Err(_) => return Err(anyhow!("Output directory absolute path get error."))
-    };
-
-    // 出力先がディレクトリか確認
-    if !is_dir(&output_directory_abs) {
-        return Err(anyhow!(format!("{} is not directory.", output_directory)))
     }
 
     // CSVリーダーを初期化
@@ -60,10 +45,8 @@ pub fn extract_column(
         return Err(anyhow!("Mistake designation index."))
     }
 
-    // 出力ファイル名
-    let output_path = output_directory_abs.join("extract_column.csv");
     // CSVファイル出力用のWriterを作成
-    let mut writer = WriterBuilder::new().from_path(output_path).map_err(|e| anyhow!("Writer create error.: {}", e))?;
+    let mut writer = WriterBuilder::new().from_writer(io::stdout());
 
     // 残す列のみを含むヘッダーを書き込む
     let selected_headers: Vec<&str> = header_index.iter().map(|&i| headers.get(i).expect("Header get error")).collect();

@@ -220,16 +220,6 @@ fn main() {
                         .required(true)
                         .value_parser(clap::value_parser!(String))
                         .num_args(1..)
-                )
-                .arg(
-                    Arg::new("output")
-                        .short('o')
-                        .long("output")
-                        .value_name("OUTPUT")
-                        .help("ex) ~/Desktop")
-                        .required(false)
-                        .value_parser(clap::value_parser!(String))
-                        .default_value("./"),
                 ),
         )
         .subcommand(
@@ -726,13 +716,12 @@ fn main() {
 
     // "excol" ex) texas excol -t ./testfile/test2.csv -c name score
     } else if let Some(matches) = matches.subcommand_matches("excol") {
-        if let (Some(target_file), Some(columns), Some(output_dir)) = (
+        if let (Some(target_file), Some(columns)) = (
             matches.get_one::<String>("target"),
             matches.get_many::<String>("columns"),
-            matches.get_one::<String>("output"),
         ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
-            match extract_column(target_file, columns_str, output_dir) {
+            match extract_column(target_file, columns_str) {
                 Ok(message) => println!("{}", message),
                 Err(e) => println!("{}", e),
             }
