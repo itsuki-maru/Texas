@@ -2,6 +2,7 @@ use clap::{Arg, Command};
 use std::collections::HashSet;
 mod texas;
 mod utils;
+mod scheme;
 use texas::{
     aggregate::aggregate_csv_data,
     groupby::groupby_column_csv,
@@ -18,7 +19,9 @@ use texas::{
     lastrow::get_last_row,
     wc::{line_count, word_count},
     csv_tree::csv_tree,
+    sum_col::sum_column,
 };
+use scheme::SumMode;
 
 fn main() {
     let matches = Command::new("texas")
@@ -537,6 +540,47 @@ fn main() {
                         .num_args(1..)
                 )
         )
+        .subcommand(
+            Command::new("sumcol")
+                .about("Sum column CSV.")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("ex) -t ./testfile/test2.csv")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String)),
+                )
+                .arg(
+                    Arg::new("columns")
+                        .short('c')
+                        .long("columns")
+                        .value_name("TARGET COLUMNS")
+                        .help("ex) -c name score")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String))
+                        .num_args(1..)
+                )
+                .arg(
+                    Arg::new("sum")
+                        .short('s')
+                        .long("sumname")
+                        .value_name("SUM NEW COLUMN NAME")
+                        .help("ex) -s Sum")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String)),
+                )
+                .arg(
+                    Arg::new("mode")
+                        .short('m')
+                        .long("mode")
+                        .value_name("MODE")
+                        .help("ex) -m auto")
+                        .default_value("auto")
+                        .value_parser(clap::value_parser!(SumMode)),
+                ),
+        )
         .get_matches();
 
     // Welcome Command
@@ -835,6 +879,20 @@ fn main() {
             match csv_tree(target_file, key_column, name_column,count_columns_str, sum_columns_str) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
+            }
+        }
+    // "sumcol" ex) texas sumcol -t ./testfile/test2.csv -c name score
+    } else if let Some(matches) = matches.subcommand_matches("sumcol") {
+        if let (Some(target_file), Some(columns), Some(new_column_name), Some(mode)) = (
+            matches.get_one::<String>("target"),
+            matches.get_many::<String>("columns"),
+            matches.get_one::<String>("sum"),
+            matches.get_one::<SumMode>("mode"),
+        ) {
+            let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
+            match sum_column(target_file, columns_str, new_column_name, *mode) {
+                Ok(_) => {},
+                Err(e) => println!("{}", e),
             }
         }
     }

@@ -14,3 +14,4 @@ pub mod csvtojson;
 pub mod lastrow;
 pub mod wc;
 pub mod csv_tree;
+pub mod sum_col;
