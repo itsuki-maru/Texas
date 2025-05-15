@@ -61,11 +61,14 @@ pub fn sort_csv_by_column(
 
     // ソートされたレコードを標準出力
     let mut writer = WriterBuilder::new().from_writer(io::stdout());
-    let _ = writer.write_record(&headers);
+    writer.write_record(&headers)?;
 
     for record in records {
-        writer.write_record(&record).map_err(|e| anyhow!("Stdout write error: {}", e))?;
+        writer.write_record(&record)
+            .map_err(|e| anyhow!("Stdout write error: {}", e))?;
     }
+    // ファイルをフラッシュして書き込みを確定
+    writer.flush().expect("Flush error.");
 
     Ok(())
 }

@@ -16,6 +16,7 @@ enum Value {
 pub fn sum(
     target_file: &str,
     target_column: &str,
+    is_count: bool,
 ) -> Result<()> {
 
     // 対象ファイルの絶対パスを取得
@@ -86,8 +87,11 @@ pub fn sum(
     // count(usize)のフォーマット
     let formatted_count = format_with_connma(count as i64);
 
-    println!("===== COLUMN: {} =====", target_column);
-    println!("SUM: {} COUNT: {}", formatted_total, formatted_count);
+    if is_count {
+        println!("{}", formatted_count);
+    } else {
+        println!("{}", formatted_total);
+    }
 
     Ok(())
 }

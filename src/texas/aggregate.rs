@@ -1,6 +1,7 @@
-use csv::ReaderBuilder;
+use csv::{ReaderBuilder, WriterBuilder};
 use std::collections::HashMap;
 use std::fs::File;
+use std::io::{self, BufWriter, Write};
 use anyhow::{Result, anyhow};
 use super::super::utils::{get_abs_filepath, is_file, format_with_connma};
 
@@ -86,30 +87,43 @@ pub fn aggregate_csv_data(
     }
 
     // 結果を出力
+    // CSV
     if is_csv {
-        // CSV形式で出力
+        // 標準出力用のWriterを作成
+        let mut writer = WriterBuilder::new().from_writer(io::stdout());
         for case in target_columns_indexes.iter() {
             let key_column = match headers.get(*case) {
                 Some(col_name) => col_name,
                 None => return Err(anyhow!("Column name: `{}` not found.", key_column)),
             };
-            println!("========== {} ==========", key_column);
-            println!("CASE,TOTAL,COUNT,AVE");
+            let header_string = format!("{}(case),{}(total),{}(count),{}(average)", key_column, key_column, key_column, key_column);
+            let header_record = csv::StringRecord::from(header_string.split(",").collect::<Vec<_>>());
+            writer.write_record(&header_record)?;
             if let Some(inner_map) = data.get(&case.to_string()) {
                 for item in inner_map.iter() {
                     let average = item.1.0 / item.1.1 as f64;
-                    println!("{},{},{},{}", item.0, item.1.0, item.1.1, average);
-                }
+
+                    let record_string = format!("{},{},{},{}", item.0, item.1.0, item.1.1, average);
+                    let new_record = csv::StringRecord::from(record_string.split(",").collect::<Vec<_>>());
+                    writer.write_record(&new_record)?;
+                }                
             }
         }
-    } else {
-        // 標準出力
+        // ファイルをフラッシュして書き込みを確定
+        writer.flush().expect("Flush error.");
+    }
+
+    // 標準出力
+    if !is_csv {
+        // 標準出力用のWriterを作成
+        let mut writer = BufWriter::new(io::stdout());
         for case in target_columns_indexes.iter() {
             let key_column = match headers.get(*case) {
                 Some(col_name) => col_name,
                 None => return Err(anyhow!("Column name: `{}` not found.", key_column)),
             };
-            println!("====================== KEY COLUMN: {} ======================", key_column);
+            writeln!(writer, "====================== KEY COLUMN: {} ======================", key_column)
+                .map_err(|e| anyhow!("Write error.: {}", e))?;
             if let Some(inner_map) = data.get(&case.to_string()) {
                 for item in inner_map.iter() {
                     // total(f64)のフォーマット
@@ -128,11 +142,13 @@ pub fn aggregate_csv_data(
                     let formatted_average_integer = format_with_connma(average_integet_part);
                     let formatted_average = format!("{}{}", formatted_average_integer, format!("{:.3}", average_decimal_part).trim_start_matches('0'));
 
-                    println!("CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", item.0, formatted_total, count_formatted, formatted_average);
+                    writeln!(writer, "CASE:\t{}\tTOTAL:\t{}\tCOUNT:\t{}\tAVE:\t{}", item.0, formatted_total, count_formatted, formatted_average)
+                        .map_err(|e| anyhow!("Write error.: {}", e))?;
                 }
             }
         }
+        // ファイルをフラッシュして書き込みを確定
+        writer.flush().expect("Flush error.");
     }
-
     Ok(())
 }

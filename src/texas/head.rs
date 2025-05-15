@@ -1,5 +1,6 @@
 use csv::ReaderBuilder;
 use std::fs::{self, File};
+use std::io::{self, BufWriter, Write};
 use anyhow::{Result, anyhow};
 use super::super::utils::{
     get_abs_filepath,
@@ -38,13 +39,20 @@ pub fn print_head(
     let lines = text.split("\n").collect::<Vec<_>>();
     // 行番号
     let mut row_number = 1;
+
+    // 標準出力用のWriterを作成
+    let mut writer = BufWriter::new(io::stdout());
+
     for (i, line) in lines.iter().enumerate() {
-        println!("{}:\t{}", row_number, line);
+        writeln!(writer, "{}:\t{}", row_number, line).map_err(|e| anyhow!("Write error.: {}", e))?;
         row_number += 1;
         if i == read_limit-1 {
             break;
         }
     }
+
+    // ファイルをフラッシュして書き込みを確定
+    writer.flush().expect("Flush error.");
     Ok(())
 }
 

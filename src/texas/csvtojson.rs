@@ -2,6 +2,7 @@ use csv::ReaderBuilder;
 use serde_json;
 use std::collections::HashMap;
 use std::fs::File;
+use std::io::{self, BufWriter, Write};
 use anyhow::{Result, anyhow};
 use super::super::utils::{
     get_abs_filepath,
@@ -42,6 +43,9 @@ pub fn csv_to_json(
     // データを格納するベクタを初期化
     let mut records = Vec::new();
 
+    // 標準出力用のWriterを作成
+    let mut writer = BufWriter::new(io::stdout());
+
     for result in reader.records() {
         let record = result?;
         let mut data_record: HashMap<String, serde_json::Value> = HashMap::new();
@@ -71,8 +75,11 @@ pub fn csv_to_json(
 
     // レコードをJSON文字列に変換
     let serialized_json = serde_json::to_string(&records)?;
+    writeln!(writer, "{}", serialized_json)
+        .map_err(|e| anyhow!("Write error.: {}", e))?;
 
-    println!("{}", serialized_json);
+    // ファイルをフラッシュして書き込みを確定
+    writer.flush().expect("Flush error.");
 
     Ok(())
 }

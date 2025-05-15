@@ -158,11 +158,11 @@ fn main() {
                         .action(clap::ArgAction::SetTrue)
                 )
                 .arg(
-                    Arg::new("iscsv")
-                        .short('i')
-                        .long("iscsv")
+                    Arg::new("csv")
+                        .short('C')
+                        .long("csv")
                         .value_name("OUTPUT CSV")
-                        .help("ex) -i")
+                        .help("ex) -C")
                         .required(false)
                         .action(clap::ArgAction::SetTrue)
                 ),
@@ -400,6 +400,15 @@ fn main() {
                         .help("ex) -c score")
                         .required(true)
                         .value_parser(clap::value_parser!(String)),
+                )
+                .arg(
+                    Arg::new("frequency")
+                        .short('f')
+                        .long("frequency")
+                        .value_name("OCCURRENCE COUNT")
+                        .help("ex) -f")
+                        .required(false)
+                        .action(clap::ArgAction::SetTrue)
                 ),
         )
         .subcommand(
@@ -635,38 +644,23 @@ fn main() {
 
     // "aggregate" ex) texas aggregate -t ./testfile/test2.csv -k name -c score
     } else if let Some(matches) = matches.subcommand_matches("aggregate") {
-        if let (Some(target_file), Some(key_column), Some(columns), floatmode, is_csv) = (
+        if let (
+            Some(target_file),
+            Some(key_column),
+            Some(columns),
+            floatmode, 
+            is_csv,
+        ) = (
             matches.get_one::<String>("target"),
             matches.get_one::<String>("keycol"),
             matches.get_many::<String>("columns"),
             matches.get_flag("floatmode"),
-            matches.get_flag("iscsv"),
+            matches.get_flag("csv"),
         ) {
             let columns_str: Vec<&str> = columns.map(|c| c.as_str()).collect();
-            if floatmode {
-                if is_csv {
-                    match aggregate_csv_data(target_file, key_column, &columns_str, true, true) {
-                        Ok(_) => {return},
-                        Err(e) => println!("{}", e)
-                    }
-                } else {
-                    match aggregate_csv_data(target_file, key_column, &columns_str, true, false) {
-                        Ok(_) => {return},
-                        Err(e) => println!("{}", e)
-                    }
-                }
-            } else {
-                if is_csv {
-                    match aggregate_csv_data(target_file, key_column, &columns_str, false, true) {
-                        Ok(_) => {return},
-                        Err(e) => println!("{}", e)
-                    }
-                } else {
-                    match aggregate_csv_data(target_file, key_column, &columns_str, false, false) {
-                        Ok(_) => {return},
-                        Err(e) => println!("{}", e)
-                    }
-                }
+            match aggregate_csv_data(target_file, key_column, &columns_str, floatmode, is_csv) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e)
             }
         }
 
@@ -702,7 +696,7 @@ fn main() {
         ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
             match extract_column(target_file, columns_str) {
-                Ok(_) => {},
+                Ok(_) => {return},
                 Err(e) => println!("{}", e),
             }
         }
@@ -714,7 +708,7 @@ fn main() {
             matches.get_one::<String>("regex"),
         ) {
             match clean_row(target_file, regex_pattrern) {
-                Ok(_) => {},
+                Ok(_) => {return},
                 Err(e) => println!("{}", e),
             }
         }
@@ -743,12 +737,12 @@ fn main() {
         ) {
             if csv_header {
                 match grep_row(target_file, regex_pattern, true) {
-                    Ok(_) => {},
+                    Ok(_) => {return},
                     Err(e) => println!("{}", e)
                 }
             } else {
                 match grep_row(target_file, regex_pattern, false) {
-                    Ok(_) => {},
+                    Ok(_) => {return},
                     Err(e) => println!("{}", e)
                 }
             }
@@ -775,18 +769,19 @@ fn main() {
             matches.get_one::<String>("sed"),
         ) {
             match red(target_file, regex_pattern, replaced_text) {
-                Ok(_) => {},
+                Ok(_) => {return},
                 Err(e) => println!("{}", e)
             }
         }
     
     // "sum" texas sum -t ./testfile/test2.csv -c score
     } else if let Some(matches) = matches.subcommand_matches("sum") {
-        if let (Some(target_file), Some(column_name)) = (
+        if let (Some(target_file), Some(column_name), frequency) = (
             matches.get_one::<String>("target"),
             matches.get_one::<String>("colname"),
+            matches.get_flag("frequency"),
         ) {
-            match sum(target_file, column_name) {
+            match sum(target_file, column_name, frequency) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e)
             }
@@ -857,7 +852,7 @@ fn main() {
         ) {
             let columns_str: HashSet<&str> = columns.map(|c| c.as_str()).collect();
             match sum_column(target_file, columns_str, new_column_name, *mode) {
-                Ok(_) => {},
+                Ok(_) => {return},
                 Err(e) => println!("{}", e),
             }
         }
