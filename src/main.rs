@@ -20,6 +20,8 @@ use texas::{
     wc::{line_count, word_count},
     csv_tree::csv_tree,
     sum_col::sum_column,
+    utf8::shiftjis_to_utf8,
+    shiftjis::utf8_to_shiftjis,
 };
 use scheme::SumMode;
 
@@ -560,6 +562,32 @@ fn main() {
                         .value_parser(clap::value_parser!(SumMode)),
                 ),
         )
+        .subcommand(
+            Command::new("utf8")
+                .about("SHIFT-JIS to UTF-8")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("ex) -t ./testfile/test7-shift-jis.csv")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String)),
+                ),
+        )
+        .subcommand(
+            Command::new("shiftjis")
+                .about("UTF-8 to SHIFT-JIS")
+                .arg(
+                    Arg::new("target")
+                        .short('t')
+                        .long("target")
+                        .value_name("FILE")
+                        .help("ex) -t ./testfile/test8-utf8.csv")
+                        .required(true)
+                        .value_parser(clap::value_parser!(String)),
+                ),
+        )
         .get_matches();
 
     // Welcome Command
@@ -854,6 +882,27 @@ fn main() {
             match sum_column(target_file, columns_str, new_column_name, *mode) {
                 Ok(_) => {return},
                 Err(e) => println!("{}", e),
+            }
+        }
+
+    // "utf8" ex) texas utf8 -t ./testfile/test7-shift-jis.csv
+    } else if let Some(matches) = matches.subcommand_matches("utf8") {
+        if let (Some(target_file),) = (
+            matches.get_one::<String>("target"),
+        ) {
+            match shiftjis_to_utf8(target_file) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e), 
+            }
+        }
+    // "shiftjis" ex) texas shiftjis -t ./testfile/test8-utf8.csv
+    } else if let Some(matches) = matches.subcommand_matches("shiftjis") {
+        if let (Some(target_file),) = (
+            matches.get_one::<String>("target"),
+        ) {
+            match utf8_to_shiftjis(target_file) {
+                Ok(_) => {return},
+                Err(e) => println!("{}", e), 
             }
         }
     }

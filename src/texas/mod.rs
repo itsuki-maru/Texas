@@ -15,3 +15,5 @@ pub mod lastrow;
 pub mod wc;
 pub mod csv_tree;
 pub mod sum_col;
+pub mod utf8;
+pub mod shiftjis;
