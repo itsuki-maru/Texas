@@ -157,3 +157,21 @@ texas csvtree -t ./testfile/test6.csv -c category -k name -C origin grade size -
 ```bash
 texas sumcol -t ./testfile/test2.csv -c score use -s score+use 
 ```
+
+## utf8
+
+文字コードが SHIFT-JIS のテキストファイルを UTF-8 に変換するコマンド。
+
+```shell
+texas utf8 -t ./testfile/test7-shift-jis.csv > utf8.csv
+# UTF8なので標準出力も特に問題なく可能
+texas utf8 -t ./testfile/test7-shift-jis.csv
+```
+
+## shiftjis
+
+文字コードが UTF-8 のテキストファイルを SHIFT-JIS に変換するコマンド。なお、標準出力の文字コードは通常 UTF-8 である。このため、Linux環境下では、文字化けが発生したり、Windows環境下では標準出力（コンソール）では、非UTF-8のバイト列を直接出力できないため、エラーとなる。基本的にはファイルに対してリダイレクトするコマンド。
+
+```bash
+texas shiftjis -t ./testfile/test8-utf8.csv > shift-jis.csv
+```
