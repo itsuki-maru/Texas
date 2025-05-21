@@ -1,5 +1,25 @@
 # Release Notes
 
+## Version 1.3.0
+
+### utf8 サブコマンドの追加
+
+SHIFT-JISの文字コードを使用するファイルをUTF-8に変換するコマンド。主にWindows ExcelなどをCSVファイルにエクスポートしたものを後続処理するために使用。
+
+```bash
+texas utf8 -t ./testfile/test7-shift-jis.csv > utf8.csv
+# UTF8なので標準出力も特に問題なく可能
+texas utf8 -t ./testfile/test7-shift-jis.csv
+```
+
+### shiftjis サブコマンドの追加
+
+文字コードが UTF-8 のテキストファイルを SHIFT-JIS に変換するコマンド。主にUTF-8で処理したテキストファイル（CSV）をExcelでそのまま開けるようにするなどの用途で使用。デフォルトでは標準出力だが、SHIFT-JISで端末上にに出力することはない（文字化けやエラーが発生）ので、基本的にはファイルに対してリダイレクトして使用する。
+
+```bash
+texas shiftjis -t ./testfile/test8-utf8.csv > shift-jis.csv
+```
+
 ## Version 1.2.0
 
 ### サブコマンドの追加

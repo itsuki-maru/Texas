@@ -162,7 +162,7 @@ texas sumcol -t ./testfile/test2.csv -c score use -s score+use
 
 文字コードが SHIFT-JIS のテキストファイルを UTF-8 に変換するコマンド。
 
-```shell
+```bash
 texas utf8 -t ./testfile/test7-shift-jis.csv > utf8.csv
 # UTF8なので標準出力も特に問題なく可能
 texas utf8 -t ./testfile/test7-shift-jis.csv

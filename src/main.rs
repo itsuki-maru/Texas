@@ -27,7 +27,7 @@ use scheme::SumMode;
 
 fn main() {
     let matches = Command::new("texas")
-        .version("1.2.0")
+        .version("1.3.0")
         .author("Itsuki Maru")
         .about("Text file proessing tool.")
         .subcommand(
